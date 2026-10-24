@@ -22,7 +22,7 @@ namespace OperationHoneycomb.Characters
                 ChangeTo(next);
         }
 
-        private void ChangeTo(ICompanionState next)
+         public void ChangeTo(ICompanionState next)
         {
             Current.Exit();
             Current = next;
