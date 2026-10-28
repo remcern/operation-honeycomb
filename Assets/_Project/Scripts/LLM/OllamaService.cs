@@ -8,7 +8,6 @@ using UnityEngine.Networking;
 public class OllamaService : MonoBehaviour
 {
     private const string ApiUrl = "http://localhost:11434/api/generate";
-
     [Serializable]
     private class OllamaRequest
     {
@@ -31,21 +30,14 @@ public class OllamaService : MonoBehaviour
         public string owl_response;
     }
 
-    private void Start()
+  
+    
+        private void Start()
     {
-        StartCoroutine(EvaluateRiddle(
-            "bilmece_1",
-            "Dört ayaðý var ama yürüyemez. Nedir?",
-            "masa",
-            "yemek masasý"
-        ));
-        StartCoroutine(EvaluateRiddle(
-        "bilmece_2",
-        "Kanatlarý vardýr ama kuþ deðildir. Uçar ama canlý deðildir. Nedir?",
-        "uçak",
-        "yolcu uçaðý"
-        ));
+        Debug.Log("OllamaService hazýr. Oyuncunun cevabý bekleniyor.");
     }
+   
+    
 
 
     public IEnumerator EvaluateRiddle(
