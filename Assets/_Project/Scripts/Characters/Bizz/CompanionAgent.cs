@@ -6,7 +6,7 @@ namespace OperationHoneycomb.Characters
     /// <summary>NavMeshAgent'ı saran hareket sınıfı. Yol bulmayı Unity NavMesh yapar;
     /// bu sınıf yalnızca "şuraya git", "dur" ve "vardın mı?" sorularını yanıtlar.</summary>
     [RequireComponent(typeof(NavMeshAgent))]
-    public sealed class CompanionAgent : MonoBehaviour
+    public sealed class CompanionAgent : MonoBehaviour, IWindAffected
     {
         [Header("Hareket")]
         [SerializeField] private float stoppingDistance = 0.4f;
@@ -16,11 +16,14 @@ namespace OperationHoneycomb.Characters
         [SerializeField] private float flyingHeight = 1.2f;
 
         private NavMeshAgent _agent;
+        private float _baseSpeed;
+        private float _windFactor = 1f;
 
         public bool HasPath { get { return _agent.hasPath; } }
         public bool IsPathPending { get { return _agent.pathPending; } }
         public bool PathFailed { get { return _agent.pathStatus == NavMeshPathStatus.PathInvalid; } }
         public float RemainingDistance { get { return _agent.remainingDistance; } }
+        public float WindFactor { get { return _windFactor; } }
 
         public bool HasArrived
         {
@@ -37,6 +40,13 @@ namespace OperationHoneycomb.Characters
             _agent = GetComponent<NavMeshAgent>();
             _agent.stoppingDistance = stoppingDistance;
             _agent.baseOffset = flyingHeight;
+            _baseSpeed = _agent.speed;
+        }
+
+        public void SetWindFactor(float speedFactor)
+        {
+            _windFactor = Mathf.Clamp(speedFactor, 0.05f, 1f);
+            _agent.speed = _baseSpeed * _windFactor;
         }
 
         /// <summary>Hedefe en yakın NavMesh noktasını bulup oraya yürümeye başlar.

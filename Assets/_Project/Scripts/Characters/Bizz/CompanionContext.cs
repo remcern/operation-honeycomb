@@ -13,19 +13,13 @@ namespace OperationHoneycomb.Characters
         /// <summary>Emir yokken takip edilecek hedef (Bumbu). Boşsa takip yapılmaz.</summary>
         public Transform FollowTarget { get; set; }
 
-        /// <summary>Oyuncunun verdiği emirdeki hedef nokta.</summary>
+        /// <summary>Rüzgâr alanında takip yerine gidilecek nokta (yoksa null).</summary>
+        public Transform OverrideTarget { get; set; }
+
         public Vector3 TargetPosition { get; set; }
-
-        /// <summary>Hedefte kullanılacak nesne (mandal vb.). Sadece bir noktaya gidiliyorsa null.</summary>
         public IInteractable TargetInteractable { get; set; }
-
-        /// <summary>Bekleyen bir emir var mı?</summary>
         public bool HasOrder { get; set; }
-
-        /// <summary>Son emir tamamlandı mı?</summary>
         public bool OrderCompleted { get; set; }
-
-        /// <summary>Son emir başarısız oldu mu (hedefe ulaşılamadı vb.)?</summary>
         public bool OrderFailed { get; set; }
 
         public CompanionContext(Transform self, CompanionAgent agent, ICompanionSensor sensor)

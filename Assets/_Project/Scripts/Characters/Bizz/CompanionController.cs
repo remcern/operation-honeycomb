@@ -14,6 +14,7 @@ namespace OperationHoneycomb.Characters
 
         private CompanionContext _context;
         private CompanionStateMachine _machine;
+        private CompanionAgent _agentRef;
 
         private IdleState _idle;
         private FollowPlayerState _follow;
@@ -31,21 +32,30 @@ namespace OperationHoneycomb.Characters
         public bool OrderCompleted { get { return _context.OrderCompleted; } }
         public bool OrderFailed { get { return _context.OrderFailed; } }
 
-        /// <summary>Emir almaya hazir mi? (Idle ya da Follow durumunda)</summary>
         public bool IsAvailable
         {
             get { return CurrentStateName == "Idle" || CurrentStateName == "Follow"; }
         }
 
+        public float WindFactorNow
+        {
+            get { return _agentRef != null ? _agentRef.WindFactor : 1f; }
+        }
+
+        /// <summary>Rüzgâr alanında Bizz'in gideceği nokta (null verilirse normal takip).</summary>
+        public void SetOverrideTarget(Transform t)
+        {
+            if (_context != null) _context.OverrideTarget = t;
+        }
+
         private void Awake()
         {
-            CompanionAgent agent = GetComponent<CompanionAgent>();
+            _agentRef = GetComponent<CompanionAgent>();
             CompanionSensor sensor = GetComponent<CompanionSensor>();
-            _context = new CompanionContext(transform, agent, sensor);
+            _context = new CompanionContext(transform, _agentRef, sensor);
             _context.FollowTarget = followTarget;
             _machine = new CompanionStateMachine();
 
-            // Durumlar birbirini tanimaz; gecisler buradan fonksiyon olarak verilir.
             _idle = new IdleState(_context, () => _goToTarget);
             _follow = new FollowPlayerState(_context, () => _goToTarget);
             _goToTarget = new GoToTargetState(
@@ -59,7 +69,6 @@ namespace OperationHoneycomb.Characters
             _done = new DoneState(_context, () => RestState());
         }
 
-        // Emir bitince takibe (hedef varsa) ya da beklemeye doner.
         private ICompanionState RestState()
         {
             if (_context.FollowTarget != null) return _follow;
@@ -75,8 +84,6 @@ namespace OperationHoneycomb.Characters
         {
             _machine.Tick();
         }
-
-        // ---- ICommandable ----
 
         public bool CanAccept(Vector3 targetPosition)
         {
@@ -95,7 +102,6 @@ namespace OperationHoneycomb.Characters
             _context.HasOrder = true;
         }
 
-        /// <summary>Bir nesneye (mandal vb.) gidip onu kullanma emri.</summary>
         public void GoToAndInteract(IInteractable target)
         {
             if (target == null || !CanAccept(target.InteractionPoint)) return;

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace OperationHoneycomb.Characters
 {
     /// <summary>Emir yokken Bizz, Bumbu'yu NavMesh üzerinde takip eder.
-    /// Uzaklaşınca yürümeye başlar, yaklaşınca durur (iki eşik: titreme olmasın).</summary>
+    /// Rüzgâr alanında geçici hedef (OverrideTarget) verilirse oraya gider.</summary>
     public sealed class FollowPlayerState : ICompanionState
     {
         private readonly CompanionContext _context;
@@ -42,13 +42,18 @@ namespace OperationHoneycomb.Characters
         public ICompanionState Tick()
         {
             if (_context.HasOrder) return _onOrder();
-            if (_context.FollowTarget == null) return null;
 
-            Vector3 delta = _context.FollowTarget.position - _context.Self.position;
+            Transform target = _context.OverrideTarget != null ? _context.OverrideTarget : _context.FollowTarget;
+            if (target == null) return null;
+
+            Vector3 delta = target.position - _context.Self.position;
             delta.y = 0f;
             float distance = delta.magnitude;
 
-            if (_moving && distance <= _stopDistance)
+            bool forced = _context.OverrideTarget != null;
+            if (forced && distance > 0.5f) _moving = true;
+
+            if (_moving && !forced && distance <= _stopDistance)
             {
                 _moving = false;
                 _context.Agent.Stop();
@@ -64,7 +69,7 @@ namespace OperationHoneycomb.Characters
                 if (_timer <= 0f)
                 {
                     _timer = _repathInterval;
-                    _context.Agent.MoveTo(_context.FollowTarget.position);
+                    _context.Agent.MoveTo(target.position);
                 }
             }
 
