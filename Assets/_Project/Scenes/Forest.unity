@@ -1620,6 +1620,7 @@ GameObject:
   - component: {fileID: 1450898310}
   - component: {fileID: 1450898309}
   - component: {fileID: 1450898311}
+  - component: {fileID: 1450898312}
   m_Layer: 0
   m_Name: Bambu
   m_TagString: Untagged
@@ -1770,6 +1771,21 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
+--- !u!114 &1450898312
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1450898303}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05b06a1d20e0fcf468d931a60b5fab79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OperationHoneycomb.Characters.SpeechBubble
+  offset: {x: 0, y: 2.2, z: 0}
+  maxWidth: 220
+  fontSize: 16
 --- !u!1 &1452522519
 GameObject:
   m_ObjectHideFlags: 0
@@ -1843,6 +1859,8 @@ GameObject:
   - component: {fileID: 1778046772}
   - component: {fileID: 1778046771}
   - component: {fileID: 1778046778}
+  - component: {fileID: 1778046779}
+  - component: {fileID: 1778046780}
   m_Layer: 0
   m_Name: Bizz
   m_TagString: Untagged
@@ -2013,6 +2031,35 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1778046779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778046770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05b06a1d20e0fcf468d931a60b5fab79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OperationHoneycomb.Characters.SpeechBubble
+  offset: {x: 0, y: 2.2, z: 0}
+  maxWidth: 220
+  fontSize: 16
+--- !u!114 &1778046780
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778046770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 548db54621d61c14eb00b132987484b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OperationHoneycomb.Characters.CompanionDialogue
+  bizzBubble: {fileID: 1778046779}
+  bumbuBubble: {fileID: 1450898312}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
