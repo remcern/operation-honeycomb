@@ -1802,9 +1802,9 @@ MonoBehaviour:
   companion: {fileID: 1778046771}
   leverObject: {fileID: 104735482}
   doorObject: {fileID: 1324489882}
-  useObstacle: 1
+  useObstacle: 0
   obstacle: {fileID: 1450898307}
-  scenarioName: engelli
+  scenarioName: takipli
   trialCount: 30
   seed: 12345
   trialTimeout: 40

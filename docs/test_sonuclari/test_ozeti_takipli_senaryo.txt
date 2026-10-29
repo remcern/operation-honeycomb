@@ -1,0 +1,9 @@
+BIZZ OTONOM KAHRAMAN - TAKIPLI SENARYO TESTI
+Tarih: 29.10.2026
+Yontem: NavMesh tabanli yol bulma, durum makinesi (Follow durumu dahil), Raycast sensoru
+Deneme sayisi: 30 (seed 12345, rastgele baslangic konumlari)
+Basari: 30/30 (%100.0)
+Ortalama sure: 2.97 sn (Time Scale 2 ile olculdu)
+En kisa: 1.97 sn
+En uzun: 4.37 sn
+Kosullar: Takip modu acik, Bumbu hareketsiz
