@@ -3,16 +3,20 @@ using UnityEngine.AI;
 
 namespace OperationHoneycomb.Characters
 {
-    /// <summary>Bizz'in ana denetleyicisi. Sensör, agent ve beş durumu birbirine bağlar,
+    /// <summary>Bizz'in ana denetleyicisi. Sensör, agent ve durumları birbirine bağlar,
     /// oyuncudan gelen emirleri ICommandable arayüzüyle kabul eder.</summary>
     [RequireComponent(typeof(CompanionAgent))]
     [RequireComponent(typeof(CompanionSensor))]
     public sealed class CompanionController : MonoBehaviour, ICommandable
     {
+        [Header("Takip (bos birakilirsa Bizz yerinde bekler)")]
+        [SerializeField] private Transform followTarget;
+
         private CompanionContext _context;
         private CompanionStateMachine _machine;
 
         private IdleState _idle;
+        private FollowPlayerState _follow;
         private GoToTargetState _goToTarget;
         private AvoidObstacleState _avoid;
         private PullLeverState _pullLever;
@@ -27,29 +31,44 @@ namespace OperationHoneycomb.Characters
         public bool OrderCompleted { get { return _context.OrderCompleted; } }
         public bool OrderFailed { get { return _context.OrderFailed; } }
 
+        /// <summary>Emir almaya hazir mi? (Idle ya da Follow durumunda)</summary>
+        public bool IsAvailable
+        {
+            get { return CurrentStateName == "Idle" || CurrentStateName == "Follow"; }
+        }
+
         private void Awake()
         {
-            var agent = GetComponent<CompanionAgent>();
-            var sensor = GetComponent<CompanionSensor>();
+            CompanionAgent agent = GetComponent<CompanionAgent>();
+            CompanionSensor sensor = GetComponent<CompanionSensor>();
             _context = new CompanionContext(transform, agent, sensor);
+            _context.FollowTarget = followTarget;
             _machine = new CompanionStateMachine();
 
-            // Durumlar birbirini tanımaz; geçişler buradan fonksiyon olarak verilir.
+            // Durumlar birbirini tanimaz; gecisler buradan fonksiyon olarak verilir.
             _idle = new IdleState(_context, () => _goToTarget);
+            _follow = new FollowPlayerState(_context, () => _goToTarget);
             _goToTarget = new GoToTargetState(
                 _context,
-                onInteract: () => _pullLever,
-                onArrived: () => _done,
-                onFailed: () => _done,
-                onObstacle: () => _avoid);
+                () => _pullLever,
+                () => _done,
+                () => _done,
+                () => _avoid);
             _avoid = new AvoidObstacleState(_context, () => _goToTarget);
             _pullLever = new PullLeverState(_context, () => _done);
-            _done = new DoneState(_context, () => _idle);
+            _done = new DoneState(_context, () => RestState());
+        }
+
+        // Emir bitince takibe (hedef varsa) ya da beklemeye doner.
+        private ICompanionState RestState()
+        {
+            if (_context.FollowTarget != null) return _follow;
+            return _idle;
         }
 
         private void Start()
         {
-            _machine.Start(_idle);
+            _machine.Start(RestState());
         }
 
         private void Update()

@@ -128,9 +128,9 @@ namespace OperationHoneycomb.Characters
 
         private IEnumerator RunTrial(int index, System.Random rng)
         {
-            // Önceki denemeden kalan emir bitsin, Bizz Idle'a dönsün
+            // Önceki denemeden kalan emir bitsin, Bizz emir almaya hazır duruma dönsün
             float waited = 0f;
-            while (companion.CurrentStateName != "Idle" && waited < 5f)
+            while (!companion.IsAvailable && waited < 5f)
             {
                 waited += Time.unscaledDeltaTime;
                 yield return null;

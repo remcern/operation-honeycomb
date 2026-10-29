@@ -10,6 +10,9 @@ namespace OperationHoneycomb.Characters
         public CompanionAgent Agent { get; private set; }
         public ICompanionSensor Sensor { get; private set; }
 
+        /// <summary>Emir yokken takip edilecek hedef (Bumbu). Boşsa takip yapılmaz.</summary>
+        public Transform FollowTarget { get; set; }
+
         /// <summary>Oyuncunun verdiği emirdeki hedef nokta.</summary>
         public Vector3 TargetPosition { get; set; }
 
