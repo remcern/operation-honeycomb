@@ -4,7 +4,7 @@ namespace OperationHoneycomb.Characters
 {
     /// <summary>Açılabilen kapı. IDoor sayesinde kapıyı açan taraf (mandal, LLM)
     /// kapının nasıl çalıştığını bilmez.</summary>
-    public sealed class Door : MonoBehaviour, IDoor
+    public sealed class Door : MonoBehaviour, IDoor, IResettable
     {
         [Header("Açılma hareketi")]
         [SerializeField] private Vector3 openOffset = new Vector3(0f, 3f, 0f);
@@ -30,6 +30,13 @@ namespace OperationHoneycomb.Characters
             if (IsOpen) return;
             IsOpen = true;
             if (navObstacle != null) navObstacle.enabled = false;
+        }
+
+        public void ResetState()
+        {
+            IsOpen = false;
+            transform.position = _closedPosition;
+            if (navObstacle != null) navObstacle.enabled = true;
         }
 
         private void Update()

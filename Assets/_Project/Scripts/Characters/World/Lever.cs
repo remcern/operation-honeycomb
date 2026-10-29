@@ -3,7 +3,7 @@ using UnityEngine;
 namespace OperationHoneycomb.Characters
 {
     /// <summary>Bizz'in indirebildiği mandal. Bağlı kapıyı IDoor üzerinden açar.</summary>
-    public sealed class Lever : MonoBehaviour, IInteractable
+    public sealed class Lever : MonoBehaviour, IInteractable, IResettable
     {
         [Header("Bağlantı")]
         [Tooltip("IDoor uygulayan bir nesne (ör. Door) sürükle.")]
@@ -18,6 +18,7 @@ namespace OperationHoneycomb.Characters
         [SerializeField] private Vector3 pulledRotation = new Vector3(60f, 0f, 0f);
 
         private IDoor _door;
+        private Vector3 _initialHandleRotation;
 
         public bool CanInteract { get; private set; } = true;
 
@@ -31,6 +32,7 @@ namespace OperationHoneycomb.Characters
             _door = doorObject as IDoor;
             if (_door == null)
                 Debug.LogError("Lever: doorObject IDoor uygulamiyor ya da atanmamis.", this);
+            if (handle != null) _initialHandleRotation = handle.localEulerAngles;
         }
 
         public void Interact()
@@ -42,6 +44,12 @@ namespace OperationHoneycomb.Characters
                 handle.localEulerAngles = pulledRotation;
 
             if (_door != null) _door.Open();
+        }
+
+        public void ResetState()
+        {
+            CanInteract = true;
+            if (handle != null) handle.localEulerAngles = _initialHandleRotation;
         }
     }
 }
