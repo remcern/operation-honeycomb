@@ -12,7 +12,8 @@ namespace OperationHoneycomb.Characters
 {
     /// <summary>Bizz'in davranışını tekrarlanabilir biçimde test eder.
     /// T tuşu: rastgele başlangıç noktalarından N deneme yapar, başarı oranını
-    /// ve ortalama süreyi ekrana, Console'a ve CSV dosyasına yazar.</summary>
+    /// ve ortalama süreyi ekrana, Console'a ve CSV dosyasına yazar.
+    /// "Use Obstacle" açıksa her denemede Bumbu, Bizz ile mandal arasına konur.</summary>
     public sealed class CompanionTestRunner : MonoBehaviour
     {
         [Header("Bağlantılar")]
@@ -21,6 +22,12 @@ namespace OperationHoneycomb.Characters
         [SerializeField] private MonoBehaviour leverObject;
         [Tooltip("IDoor ve IResettable uygulayan nesne (FenceGate).")]
         [SerializeField] private MonoBehaviour doorObject;
+
+        [Header("Zorlaştırılmış senaryo (isteğe bağlı)")]
+        [SerializeField] private bool useObstacle = false;
+        [Tooltip("Engel olarak yola konacak nesne (Bumbu). Test sırasında oyuncu kontrolü kapatılır.")]
+        [SerializeField] private Transform obstacle;
+        [SerializeField] private string scenarioName = "temel";
 
         [Header("Test ayarları")]
         [SerializeField] private int trialCount = 30;
@@ -47,11 +54,13 @@ namespace OperationHoneycomb.Characters
         private IDoor _door;
         private IResettable _doorReset;
         private NavMeshAgent _agent;
+        private PlayerController _player;
+        private CharacterController _obstacleController;
 
         private bool _running;
         private int _currentTrial;
         private float _previousTimeScale = 1f;
-        private string _summary = "T tuşu: testi başlat";
+        private string _summary = "T tusu: testi baslat";
 
         private void Awake()
         {
@@ -61,9 +70,23 @@ namespace OperationHoneycomb.Characters
             _doorReset = doorObject as IResettable;
             if (companion != null) _agent = companion.GetComponent<NavMeshAgent>();
 
-            if (companion == null || _agent == null || _lever == null || _leverReset == null
-                || _door == null || _doorReset == null)
+            if (obstacle != null)
+            {
+                _player = obstacle.GetComponent<PlayerController>();
+                _obstacleController = obstacle.GetComponent<CharacterController>();
+            }
+
+            if (!ConnectionsValid())
                 Debug.LogError("CompanionTestRunner: baglantilar eksik ya da yanlis.", this);
+
+            if (useObstacle && obstacle == null)
+                Debug.LogError("CompanionTestRunner: useObstacle acik ama obstacle atanmamis.", this);
+        }
+
+        private bool ConnectionsValid()
+        {
+            return companion != null && _agent != null && _lever != null && _leverReset != null
+                && _door != null && _doorReset != null;
         }
 
         private void OnDestroy()
@@ -79,14 +102,14 @@ namespace OperationHoneycomb.Characters
 
         private IEnumerator RunTests()
         {
-            if (companion == null || _agent == null || _lever == null || _leverReset == null
-                || _door == null || _doorReset == null)
-                yield break;
+            if (!ConnectionsValid()) yield break;
+            if (useObstacle && obstacle == null) yield break;
 
             _running = true;
             _results.Clear();
             _previousTimeScale = Time.timeScale;
             Time.timeScale = timeScale;
+            if (useObstacle && _player != null) _player.enabled = false;
             var rng = new System.Random(seed);
 
             for (int i = 1; i <= trialCount; i++)
@@ -96,6 +119,7 @@ namespace OperationHoneycomb.Characters
             }
 
             Time.timeScale = _previousTimeScale;
+            if (useObstacle && _player != null) _player.enabled = true;
             _summary = BuildSummary();
             Debug.Log(_summary);
             SaveCsv();
@@ -117,6 +141,9 @@ namespace OperationHoneycomb.Characters
 
             Vector3 start = PickStart(rng);
             _agent.Warp(start);
+
+            if (useObstacle) PlaceObstacle(start);
+
             yield return null;
             yield return null;
 
@@ -125,7 +152,14 @@ namespace OperationHoneycomb.Characters
 
             if (!companion.HasOrder)
             {
-                _results.Add(new TrialResult { Index = index, Start = start, Success = false, Duration = 0f, Reason = "Emir kabul edilmedi" });
+                _results.Add(new TrialResult
+                {
+                    Index = index,
+                    Start = start,
+                    Success = false,
+                    Duration = 0f,
+                    Reason = "Emir kabul edilmedi"
+                });
                 yield break;
             }
 
@@ -161,6 +195,21 @@ namespace OperationHoneycomb.Characters
             });
         }
 
+        // Engeli, Bizz'in başlangıcı ile mandalın etkileşim noktası arasının ortasına koyar.
+        private void PlaceObstacle(Vector3 start)
+        {
+            Vector3 target = _lever.InteractionPoint;
+            Vector3 mid = Vector3.Lerp(start, target, 0.5f);
+
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(mid, out hit, 3f, NavMesh.AllAreas))
+                mid = hit.position;
+
+            if (_obstacleController != null) _obstacleController.enabled = false;
+            obstacle.position = mid + Vector3.up * 1.3f;
+            if (_obstacleController != null) _obstacleController.enabled = true;
+        }
+
         // Mandaldan yeterince uzak, NavMesh üzerinde rastgele bir başlangıç noktası seçer.
         private Vector3 PickStart(System.Random rng)
         {
@@ -186,7 +235,9 @@ namespace OperationHoneycomb.Characters
         {
             int total = _results.Count;
             int ok = 0;
-            float sum = 0f, min = float.MaxValue, max = 0f;
+            float sum = 0f;
+            float min = float.MaxValue;
+            float max = 0f;
 
             foreach (TrialResult r in _results)
             {
@@ -197,14 +248,17 @@ namespace OperationHoneycomb.Characters
                 if (r.Duration > max) max = r.Duration;
             }
 
+            string head = "TEST SONUCU (" + scenarioName + "): ";
             if (ok == 0)
-                return "TEST SONUCU: " + total + " denemede 0 basari (%0).";
+                return head + total + " denemede 0 basari (%0).";
 
-            float rate = 100f * ok / total;
-            return "TEST SONUCU: " + ok + "/" + total + " basari (%" + rate.ToString("0.0", CultureInfo.InvariantCulture)
-                + "), ortalama sure " + (sum / ok).ToString("0.00", CultureInfo.InvariantCulture)
-                + " sn, en kisa " + min.ToString("0.00", CultureInfo.InvariantCulture)
-                + " sn, en uzun " + max.ToString("0.00", CultureInfo.InvariantCulture) + " sn.";
+            string rate = (100f * ok / total).ToString("0.0", CultureInfo.InvariantCulture);
+            string avg = (sum / ok).ToString("0.00", CultureInfo.InvariantCulture);
+            string minText = min.ToString("0.00", CultureInfo.InvariantCulture);
+            string maxText = max.ToString("0.00", CultureInfo.InvariantCulture);
+
+            return head + ok + "/" + total + " basari (%" + rate + "), ortalama sure " + avg
+                + " sn, en kisa " + minText + " sn, en uzun " + maxText + " sn.";
         }
 
         private void SaveCsv()
@@ -215,15 +269,15 @@ namespace OperationHoneycomb.Characters
                 sb.AppendLine("trial,start_x,start_z,success,duration_s,reason");
                 foreach (TrialResult r in _results)
                 {
-                    sb.Append(r.Index).Append(',')
-                      .Append(r.Start.x.ToString("0.00", CultureInfo.InvariantCulture)).Append(',')
-                      .Append(r.Start.z.ToString("0.00", CultureInfo.InvariantCulture)).Append(',')
-                      .Append(r.Success ? "1" : "0").Append(',')
-                      .Append(r.Duration.ToString("0.00", CultureInfo.InvariantCulture)).Append(',')
-                      .AppendLine(r.Reason);
+                    string x = r.Start.x.ToString("0.00", CultureInfo.InvariantCulture);
+                    string z = r.Start.z.ToString("0.00", CultureInfo.InvariantCulture);
+                    string d = r.Duration.ToString("0.00", CultureInfo.InvariantCulture);
+                    string ok = r.Success ? "1" : "0";
+                    sb.AppendLine(r.Index + "," + x + "," + z + "," + ok + "," + d + "," + r.Reason);
                 }
 
-                string path = Path.Combine(Application.persistentDataPath, "companion_test_results.csv");
+                string fileName = "companion_test_results_" + scenarioName + ".csv";
+                string path = Path.Combine(Application.persistentDataPath, fileName);
                 File.WriteAllText(path, sb.ToString(), new UTF8Encoding(false));
                 Debug.Log("Test sonuclari kaydedildi: " + path);
                 _summary += "\nCSV: " + path;
@@ -236,9 +290,13 @@ namespace OperationHoneycomb.Characters
 
         private void OnGUI()
         {
-            GUI.Label(new Rect(10, 60, 900, 25), _running
-                ? "TEST CALISIYOR: deneme " + _currentTrial + "/" + trialCount
-                : "T: Bizz testini baslat (" + trialCount + " deneme)");
+            string status;
+            if (_running)
+                status = "TEST CALISIYOR (" + scenarioName + "): deneme " + _currentTrial + "/" + trialCount;
+            else
+                status = "T: Bizz testini baslat [" + scenarioName + ", " + trialCount + " deneme]";
+
+            GUI.Label(new Rect(10, 60, 900, 25), status);
 
             if (!_running)
                 GUI.Label(new Rect(10, 82, 1200, 60), _summary);
