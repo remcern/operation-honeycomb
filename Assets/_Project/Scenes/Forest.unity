@@ -2464,6 +2464,9 @@ MonoBehaviour:
   bizzBubble: {fileID: 1778046779}
   bumbuBubble: {fileID: 1450898312}
   windArea: {fileID: 915651136}
+  releaseDistance: 3.5
+  gap: 0.5
+  lineDuration: 2.2
 --- !u!54 &1778046781
 Rigidbody:
   m_ObjectHideFlags: 0

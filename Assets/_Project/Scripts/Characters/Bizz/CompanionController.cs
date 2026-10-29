@@ -48,6 +48,12 @@ namespace OperationHoneycomb.Characters
             if (_context != null) _context.OverrideTarget = t;
         }
 
+        /// <summary>True verilirse Bizz takibi bırakıp olduğu yerde bekler.</summary>
+        public void SetHold(bool hold)
+        {
+            if (_context != null) _context.HoldPosition = hold;
+        }
+
         private void Awake()
         {
             _agentRef = GetComponent<CompanionAgent>();
