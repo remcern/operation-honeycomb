@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace OperationHoneycomb.Characters
 {
-    /// <summary>Emir yokken Bizz, Bumbu'yu NavMesh üzerinde takip eder.
+    /// <summary>Emir yokken Bizz, Bumbu'yu NavMesh üzerinde yakından takip eder.
     /// OverrideTarget varsa oraya gider, HoldPosition açıksa bekler.</summary>
     public sealed class FollowPlayerState : ICompanionState
     {
@@ -21,9 +21,9 @@ namespace OperationHoneycomb.Characters
         public FollowPlayerState(
             CompanionContext context,
             Func<ICompanionState> onOrder,
-            float startDistance = 4f,
-            float stopDistance = 2.5f,
-            float repathInterval = 0.3f)
+            float startDistance = 2.5f,
+            float stopDistance = 1.5f,
+            float repathInterval = 0.15f)
         {
             _context = context;
             _onOrder = onOrder;

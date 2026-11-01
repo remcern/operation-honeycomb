@@ -3,9 +3,8 @@ using UnityEngine;
 
 namespace OperationHoneycomb.Characters
 {
-    /// <summary>Yolda bir rüzgâr bölgesi. Bizz rüzgârda çok yavaşlar. Bumbu siper noktasında
-    /// durursa rüzgâr kesilir ve Bizz ilerler. Bizz alanın karşı ucuna çıkınca engel aşılır.
-    /// Alan her seferinde, ileri ya da geri geçişte, yeniden çalışır.</summary>
+    /// <summary>Rüzgâr bölgesi. Bizz rüzgârda çok yavaşlar. Bumbu siper noktasında durursa
+    /// rüzgâr kesilir. Engel, Bizz çıkış noktasına gerçekten varınca aşılmış sayılır.</summary>
     [RequireComponent(typeof(BoxCollider))]
     public sealed class WindArea : MonoBehaviour
     {
@@ -14,36 +13,39 @@ namespace OperationHoneycomb.Characters
         [SerializeField] private float speedFactorInWind = 0.1f;
 
         [Header("Siper")]
-        [Tooltip("Siper olacak karakter (Bumbu).")]
         [SerializeField] private Transform shield;
-        [Tooltip("Panelin önündeki işaretli nokta.")]
         [SerializeField] private Transform shieldSpot;
         [SerializeField] private float spotRadius = 2f;
 
         [Header("Geçiş")]
         [Tooltip("İleri yönde Bizz'in gideceği nokta.")]
         [SerializeField] private Transform exitPoint;
-        [Tooltip("Geri dönüşte Bizz'in gideceği nokta (alanın başlangıç ucunda).")]
+        [Tooltip("Geri dönüşte Bizz'in gideceği nokta.")]
         [SerializeField] private Transform returnExitPoint;
-        [Tooltip("Alan geçildikten kaç saniye sonra tekrar kurulsun.")]
+        [Tooltip("Bizz çıkış noktasına bu kadar yaklaşınca engel aşılmış sayılır.")]
+        [SerializeField] private float crossDistance = 1.5f;
         [SerializeField] private float rearmDelay = 2f;
 
+        private Transform _target;
+        private bool _active;
         private bool _crossed;
-        private bool _crossedForward;
-        private float _rearmAt = -1f;
+        private bool _wasShielded;
         private bool _enteredFromFront;
+        private float _rearmAt = -1f;
 
         public bool IsSheltered { get; private set; }
         public bool TargetInside { get; private set; }
+
+        /// <summary>Bizz alana girdi ve henüz çıkış noktasına varmadı.</summary>
+        public bool IsActive { get { return _active; } }
         public bool HasCrossed { get { return _crossed; } }
 
-        /// <summary>Bizz'in şu an gitmesi gereken çıkış noktası (yön alana girişe göre).</summary>
         public Transform ExitPoint
         {
             get { return _enteredFromFront ? returnExitPoint : exitPoint; }
         }
 
-        /// <summary>Engel aşılınca bir kez tetiklenir.</summary>
+        /// <summary>Engel gerçekten aşılınca bir kez tetiklenir.</summary>
         public event Action Crossed;
 
         private void Reset()
@@ -53,7 +55,21 @@ namespace OperationHoneycomb.Characters
 
         private void Update()
         {
-            if (_crossed && !TargetInside && _rearmAt > 0f && Time.time >= _rearmAt)
+            if (_active && _target != null && ExitPoint != null)
+            {
+                if (Flat(_target.position, ExitPoint.position) <= crossDistance)
+                {
+                    _active = false;
+                    if (_wasShielded && !_crossed)
+                    {
+                        _crossed = true;
+                        _rearmAt = Time.time + rearmDelay;
+                        if (Crossed != null) Crossed();
+                    }
+                }
+            }
+
+            if (_crossed && !_active && !TargetInside && _rearmAt > 0f && Time.time >= _rearmAt)
             {
                 _crossed = false;
                 _rearmAt = -1f;
@@ -62,8 +78,17 @@ namespace OperationHoneycomb.Characters
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.GetComponentInParent<IWindAffected>() == null) return;
-            _enteredFromFront = other.transform.position.z > transform.position.z;
+            IWindAffected affected = other.GetComponentInParent<IWindAffected>();
+            Component comp = affected as Component;
+            if (comp == null || _crossed) return;
+
+            if (!_active)
+            {
+                _target = comp.transform;
+                _enteredFromFront = other.transform.position.z > transform.position.z;
+                _wasShielded = false;
+                _active = true;
+            }
         }
 
         private void OnTriggerStay(Collider other)
@@ -71,7 +96,7 @@ namespace OperationHoneycomb.Characters
             IWindAffected affected = other.GetComponentInParent<IWindAffected>();
             if (affected == null) return;
 
-            if (_crossed)
+            if (_crossed || !_active)
             {
                 affected.SetWindFactor(1f);
                 return;
@@ -79,6 +104,7 @@ namespace OperationHoneycomb.Characters
 
             TargetInside = true;
             IsSheltered = ShieldInPlace();
+            if (IsSheltered) _wasShielded = true;
             affected.SetWindFactor(IsSheltered ? 1f : speedFactorInWind);
         }
 
@@ -88,29 +114,26 @@ namespace OperationHoneycomb.Characters
             if (affected == null) return;
 
             TargetInside = false;
+            IsSheltered = false;
             affected.SetWindFactor(1f);
 
+            // Geldiği yönden geri çıktıysa sahne iptal; karşı taraftan çıktıysa hedefe gitmeye devam eder.
             bool exitedFront = other.transform.position.z > transform.position.z;
-            bool crossedNow = _enteredFromFront ? !exitedFront : exitedFront;
-
-            if (IsSheltered && crossedNow && !_crossed)
-            {
-                _crossed = true;
-                _crossedForward = !_enteredFromFront;
-                _rearmAt = Time.time + rearmDelay;
-                if (Crossed != null) Crossed();
-            }
-            IsSheltered = false;
+            if (exitedFront == _enteredFromFront)
+                _active = false;
         }
 
         private bool ShieldInPlace()
         {
             if (shield == null || shieldSpot == null) return false;
-            Vector3 a = shield.position;
-            Vector3 b = shieldSpot.position;
+            return Flat(shield.position, shieldSpot.position) <= spotRadius;
+        }
+
+        private static float Flat(Vector3 a, Vector3 b)
+        {
             a.y = 0f;
             b.y = 0f;
-            return Vector3.Distance(a, b) <= spotRadius;
+            return Vector3.Distance(a, b);
         }
     }
 }
