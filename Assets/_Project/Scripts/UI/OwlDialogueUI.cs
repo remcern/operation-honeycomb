@@ -8,6 +8,7 @@ public class OwlDialogueUI : MonoBehaviour
     [SerializeField] private TMP_InputField answerInput;
     [SerializeField] private Button submitButton;
     [SerializeField] private OllamaService ollamaService;
+    [SerializeField] private TMP_Text owlResponseText;
     private bool isProcessingAnswer = false;
 
     private void Start()
@@ -48,11 +49,24 @@ public class OwlDialogueUI : MonoBehaviour
 
         Debug.Log("Oyuncunun cevabý: " + playerAnswer);
 
+        owlResponseText.text = "Bekçi Baykuþ düþünüyor...";
+
         yield return StartCoroutine(ollamaService.EvaluateRiddle(
             "bilmece_1",
             "Dört ayaðý var ama yürüyemez. Nedir?",
             "masa",
-            playerAnswer
+            playerAnswer,
+            (result, error) =>
+            {
+                if (result != null)
+                {
+                    owlResponseText.text = "Bekçi Baykuþ: " + result.owl_response;
+                }
+                else
+                {
+                    owlResponseText.text = "Bekçi Baykuþ þu anda cevap veremiyor.";
+                }
+            }
         ));
 
         isProcessingAnswer = false;
