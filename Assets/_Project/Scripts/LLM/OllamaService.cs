@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Text;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -31,10 +32,30 @@ public class OllamaService : MonoBehaviour
         public string owl_response;
     }
 
+    private bool IsValidRiddleJson(string responseJson)
+    {
+        if (string.IsNullOrWhiteSpace(responseJson))
+            return false;
+
+        bool validCorrect = Regex.IsMatch(
+            responseJson,
+            "\"is_correct\"\\s*:\\s*(true|false)\\s*[,}]"
+        );
+
+        bool validResponse = Regex.IsMatch(
+            responseJson,
+            "\"owl_response\"\\s*:\\s*\"(?:\\\\.|[^\"\\\\])*\"\\s*[,}]"
+        );
+
+
+        return validCorrect && validResponse;
+    }
+
     private void Start()
     {
         Debug.Log("OllamaService hazýr. Oyuncunun cevabý bekleniyor.");
     }
+
 
     public IEnumerator EvaluateRiddle(
         string riddleId,
@@ -55,7 +76,7 @@ public class OllamaService : MonoBehaviour
             "6. Yalnýzca is_correct ve owl_response alanlarýný içeren JSON döndür.\n" +
             "7. is_correct mutlaka true veya false olmalýdýr.\n" +
             "8. owl_response kýsa, anlaþýlýr ve doðal Türkçe olmalýdýr.\n" +
-            "9. GEmoji, gereksiz semboller veya anlamsýz karakterler kullanma.Yalnýzca türkçe metin yaz.\n\n" +
+            "9. Emoji, gereksiz semboller veya anlamsýz karakterler kullanma.Yalnýzca türkçe metin yaz.\n\n" +
             "Bilmece: " + riddle + "\n" +
             "Beklenen cevap: " + expectedAnswer + "\n" +
             "Oyuncunun cevabý: " + playerAnswer;
@@ -109,15 +130,11 @@ public class OllamaService : MonoBehaviour
                 {
                     string responseJson = ollamaResponse.response;
 
-                    if (!responseJson.Contains("\"is_correct\""))
+
+                    if (!IsValidRiddleJson(responseJson))
                     {
                         validationError =
-                            "LLM yanýtýnda is_correct alaný eksik.";
-                    }
-                    else if (!responseJson.Contains("\"owl_response\""))
-                    {
-                        validationError =
-                            "LLM yanýtýnda owl_response alaný eksik.";
+                            "LLM yanýtýndaki JSON alanlarý geçersiz.";
                     }
                     else
                     {
@@ -125,6 +142,7 @@ public class OllamaService : MonoBehaviour
                             responseJson
                         );
                     }
+
                 }
             }
             catch (Exception ex)
