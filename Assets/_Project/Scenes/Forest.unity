@@ -188,6 +188,57 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9b593549617c3b040b808a4cbb22952a, type: 3}
+--- !u!1 &38512240
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 38512242}
+  - component: {fileID: 38512241}
+  m_Layer: 0
+  m_Name: FanShutdown
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &38512241
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 38512240}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58f359358c93aea41a6a866c9eb1f20d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OperationHoneycomb.Characters.FanShutdown
+  bizz: {fileID: 1778046777}
+  exitPoint: {fileID: 754756745}
+  fanSpinner: {fileID: 1275634564}
+  bumbuBubble: {fileID: 1450898312}
+  triggerDistance: 1.5
+  delay: 5
+  stopSeconds: 3
+--- !u!4 &38512242
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 38512240}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.088, y: 1.69002, z: 35.75}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &101717997
 GameObject:
   m_ObjectHideFlags: 0
@@ -9474,13 +9525,13 @@ MonoBehaviour:
   backEdgeZ: 25
   blockOffset: 2.5
   windSpeedFactor: 0.15
-  shakeAmount: 0.06
   spotRadius: 2
   crossDistance: 1.5
   rejoinDistance: 3.5
   rearmMargin: 3
   gap: 0.4
   lineDuration: 2.2
+  showDebug: 1
 --- !u!4 &2058176415
 Transform:
   m_ObjectHideFlags: 0
@@ -9904,3 +9955,4 @@ SceneRoots:
   - {fileID: 1371183608}
   - {fileID: 2058176415}
   - {fileID: 1135495080}
+  - {fileID: 38512242}
