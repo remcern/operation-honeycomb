@@ -1,7 +1,11 @@
+ï»¿
 
+using System.Collections;
+using System.Text;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
+
 
 public class OwlDialogueUI : MonoBehaviour
 {
@@ -9,26 +13,36 @@ public class OwlDialogueUI : MonoBehaviour
     [SerializeField] private Button submitButton;
     [SerializeField] private OllamaService ollamaService;
     [SerializeField] private TMP_Text owlResponseText;
+
     private bool isProcessingAnswer = false;
 
     private void Start()
     {
-        if (answerInput == null || submitButton == null || ollamaService == null)
+        if (answerInput == null ||
+            submitButton == null ||
+            ollamaService == null ||
+            owlResponseText == null)
         {
-            Debug.LogError("OwlDialogueUI: Inspector baðlantýlarý eksik!");
+            Debug.LogError(
+                "OwlDialogueUI: Inspector baÄŸlantÄ±larÄ± eksik!"
+            );
+
+            enabled = false;
             return;
         }
 
         submitButton.onClick.AddListener(SubmitAnswer);
 
-        Debug.Log("Bekçi Baykuþ arayüzü hazýr.");
+        Debug.Log("BekÃ§i BaykuÅŸ arayÃ¼zÃ¼ hazÄ±r.");
     }
 
     private void SubmitAnswer()
     {
         if (isProcessingAnswer)
         {
-            Debug.LogWarning("Önceki cevap hâlâ deðerlendiriliyor.");
+            Debug.LogWarning(
+                "Ã–nceki cevap hÃ¢lÃ¢ deÄŸerlendiriliyor."
+            );
             return;
         }
 
@@ -36,41 +50,87 @@ public class OwlDialogueUI : MonoBehaviour
 
         if (string.IsNullOrWhiteSpace(playerAnswer))
         {
-            Debug.LogWarning("Lütfen bir cevap yaz.");
+            Debug.LogWarning("LÃ¼tfen bir cevap yaz.");
             return;
         }
 
         StartCoroutine(ProcessAnswer(playerAnswer));
     }
-    private System.Collections.IEnumerator ProcessAnswer(string playerAnswer)
+
+    private IEnumerator ProcessAnswer(string playerAnswer)
     {
         isProcessingAnswer = true;
         submitButton.interactable = false;
 
-        Debug.Log("Oyuncunun cevabý: " + playerAnswer);
+        Debug.Log("Oyuncunun cevabÄ±: " + playerAnswer);
 
-        owlResponseText.text = "Bekçi Baykuþ düþünüyor...";
+        owlResponseText.text = "BekÃ§i BaykuÅŸ dÃ¼ÅŸÃ¼nÃ¼yor...";
 
-        yield return StartCoroutine(ollamaService.EvaluateRiddle(
-            "bilmece_1",
-            "Dört ayaðý var ama yürüyemez. Nedir?",
-            "masa",
-            playerAnswer,
-            (result, error) =>
-            {
-                if (result != null)
+        yield return StartCoroutine(
+            ollamaService.EvaluateRiddle(
+                "bilmece_1",
+                "DÃ¶rt ayaÄŸÄ± var ama yÃ¼rÃ¼yemez. Nedir?",
+                "masa",
+                playerAnswer,
+                (result, error) =>
                 {
-                    owlResponseText.text = "Bekçi Baykuþ: " + result.owl_response;
+                    if (result != null)
+                    {
+                        string cleanResponse =
+                            RemoveEmojis(result.owl_response);
+
+                        owlResponseText.text =
+                            "BekÃ§i BaykuÅŸ: " + cleanResponse;
+                    }
+                    else
+                    {
+                        Debug.LogWarning(
+                            "BaykuÅŸ yanÄ±t hatasÄ±: " + error
+                        );
+
+                        owlResponseText.text =
+                            "BekÃ§i BaykuÅŸ ÅŸu anda cevap veremiyor.";
+                    }
                 }
-                else
-                {
-                    owlResponseText.text = "Bekçi Baykuþ þu anda cevap veremiyor.";
-                }
-            }
-        ));
+            )
+        );
 
         isProcessingAnswer = false;
         submitButton.interactable = true;
+    }
+    private string RemoveEmojis(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+        {
+            return string.Empty;
+        }
+
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < input.Length; i++)
+        {
+            int codePoint = char.ConvertToUtf32(input, i);
+
+            bool isEmoji =
+                (codePoint >= 0x1F000 && codePoint <= 0x1FAFF) ||
+                (codePoint >= 0x2600 && codePoint <= 0x27BF) ||
+                codePoint == 0xFE0F ||
+                codePoint == 0x200D;
+
+            if (!isEmoji)
+            {
+                result.Append(char.ConvertFromUtf32(codePoint));
+            }
+
+            if (char.IsHighSurrogate(input[i]) &&
+                i + 1 < input.Length &&
+                char.IsLowSurrogate(input[i + 1]))
+            {
+                i++;
+            }
+        }
+
+        return result.ToString().Trim();
     }
 
 
