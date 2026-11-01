@@ -3,32 +3,78 @@ using UnityEngine.InputSystem;
 
 namespace OperationHoneycomb.Characters
 {
-    /// <summary>Oyuncunun Bizz'e emir verdiği giriş sınıfı.
-    /// E tuşu: Bizz mandala gider ve onu indirir. Q tuşu: emri iptal eder.</summary>
+    /// <summary>Oyuncunun Bizz'e emir verdiği giriş sınıfı. E: mandala git, Q: iptal.
+    /// Yanlış tuş, spam, klavye yokluğu ve eksik atama oyunu bozmaz.</summary>
     public sealed class CompanionCommandInput : MonoBehaviour
     {
         [SerializeField] private CompanionController companion;
         [Tooltip("IInteractable uygulayan nesne (Lever).")]
         [SerializeField] private MonoBehaviour leverObject;
+        [Tooltip("Emirler arası en kısa süre (sn). Spam basışı engeller.")]
+        [SerializeField] private float cooldown = 0.6f;
 
         private IInteractable _lever;
+        private float _nextAllowed;
+        private string _notice = "";
+        private float _noticeUntil;
 
         private void Awake()
         {
             _lever = leverObject as IInteractable;
             if (companion == null || _lever == null)
-                Debug.LogError("CompanionCommandInput: companion ya da lever atanmamis.", this);
+                Debug.LogWarning("CompanionCommandInput: companion ya da lever atanmamis, emirler devre disi.");
         }
 
         private void Update()
         {
-            if (Keyboard.current == null || _lever == null || companion == null) return;
+            Keyboard kb = Keyboard.current;
+            if (kb == null) return;                      // klavye yok: sessizce çık
+            if (companion == null || _lever == null) return;
 
-            if (Keyboard.current.eKey.wasPressedThisFrame)
-                companion.GoToAndInteract(_lever);
+            if (kb.eKey.wasPressedThisFrame) TryOrder();
+            if (kb.qKey.wasPressedThisFrame) TryCancel();
+            // Diğer tüm tuşlar bilerek yok sayılır
+        }
 
-            if (Keyboard.current.qKey.wasPressedThisFrame)
-                companion.Cancel();
+        private void TryOrder()
+        {
+            if (Time.unscaledTime < _nextAllowed) return;     // çok hızlı basış
+            _nextAllowed = Time.unscaledTime + cooldown;
+
+            if (!_lever.CanInteract)
+            {
+                Notice("Mandal zaten indirildi.");
+                return;
+            }
+            if (companion.HasOrder || !companion.IsAvailable)
+            {
+                Notice("Bizz su an mesgul.");
+                return;
+            }
+            if (!companion.CanAccept(_lever.InteractionPoint))
+            {
+                Notice("Bizz mandala ulasamiyor.");
+                return;
+            }
+
+            companion.GoToAndInteract(_lever);
+        }
+
+        private void TryCancel()
+        {
+            if (!companion.HasOrder)
+            {
+                Notice("Iptal edilecek emir yok.");
+                return;
+            }
+            companion.Cancel();
+            Notice("Emir iptal edildi.");
+        }
+
+        private void Notice(string text)
+        {
+            _notice = text;
+            _noticeUntil = Time.unscaledTime + 2f;
         }
 
         private void OnGUI()
@@ -36,6 +82,9 @@ namespace OperationHoneycomb.Characters
             if (companion == null) return;
             GUI.Label(new Rect(10, 10, 500, 25), "E: Bizz mandala git   Q: iptal");
             GUI.Label(new Rect(10, 32, 500, 25), "Bizz durumu: " + companion.CurrentStateName);
+
+            if (!string.IsNullOrEmpty(_notice) && Time.unscaledTime < _noticeUntil)
+                GUI.Label(new Rect(10, 54, 500, 25), _notice);
         }
     }
 }
