@@ -53,7 +53,7 @@ public class OllamaService : MonoBehaviour
 
     private void Start()
     {
-        Debug.Log("OllamaService hazır. Oyuncunun cevabı bekleniyor.");
+        Debug.Log("OllamaService hazÄ±r. Oyuncunun cevabÄ± bekleniyor.");
     }
 
 
@@ -65,21 +65,21 @@ public class OllamaService : MonoBehaviour
         Action<RiddleResult, string> onComplete = null)
     {
         string prompt =
-            "Sen Operation: Honeycomb oyununda bilmece cevaplarını değerlendiren bir yapay zekasın.\n" +
-            "Oyuncunun cevabının beklenen cevapla aynı nesneyi ifade edip etmediğini belirle.\n" +
-            "ÖNEMLİ KURALLAR:\n" +
-            "1. Tam kelime eşleşmesi zorunlu değildir.\n" +
-            "2. Beklenen nesnenin bir türünü ifade eden cevaplar doğrudur.\n" +
-            "3. Oyuncunun cevabına eklediği açıklayıcı sıfatlar cevabı yanlış yapmaz.\n" +
-            "4. İlgisiz veya farklı nesneleri ifade eden cevaplar yanlıştır.\n" +
-            "5. Önce anlamı değerlendir, ardından kısa, komik ve anlamlı bir Türkçe baykuş yanıtı oluştur.\n" +
-            "6. Yalnızca is_correct ve owl_response alanlarını içeren JSON döndür.\n" +
-            "7. is_correct mutlaka true veya false olmalıdır.\n" +
-            "8. owl_response kısa, anlaşılır ve doğal Türkçe olmalıdır.\n" +
-            "9. Emoji, gereksiz semboller veya anlamsız karakterler kullanma.Yalnızca türkçe metin yaz.\n\n" +
+            "Sen Operation: Honeycomb oyununda bilmece cevaplarÄ±nÄ± deÄŸerlendiren bir yapay zekasÄ±n.\n" +
+            "Oyuncunun cevabÄ±nÄ±n beklenen cevapla aynÄ± nesneyi ifade edip etmediÄŸini belirle.\n" +
+            "Ã–NEMLÄ° KURALLAR:\n" +
+            "1. Tam kelime eÅŸleÅŸmesi zorunlu deÄŸildir.\n" +
+            "2. Beklenen nesnenin bir tÃ¼rÃ¼nÃ¼ ifade eden cevaplar doÄŸrudur.\n" +
+            "3. Oyuncunun cevabÄ±na eklediÄŸi aÃ§Ä±klayÄ±cÄ± sÄ±fatlar cevabÄ± yanlÄ±ÅŸ yapmaz.\n" +
+            "4. Ä°lgisiz veya farklÄ± nesneleri ifade eden cevaplar yanlÄ±ÅŸtÄ±r.\n" +
+            "5. Ã–nce anlamÄ± deÄŸerlendir, ardÄ±ndan kÄ±sa, komik ve anlamlÄ± bir TÃ¼rkÃ§e baykuÅŸ yanÄ±tÄ± oluÅŸtur.\n" +
+            "6. YalnÄ±zca is_correct ve owl_response alanlarÄ±nÄ± iÃ§eren JSON dÃ¶ndÃ¼r.\n" +
+            "7. is_correct mutlaka true veya false olmalÄ±dÄ±r.\n" +
+            "8. owl_response kÄ±sa, anlaÅŸÄ±lÄ±r ve doÄŸal TÃ¼rkÃ§e olmalÄ±dÄ±r.\n" +
+            "9. Emoji, gereksiz semboller veya anlamsÄ±z karakterler kullanma.YalnÄ±zca tÃ¼rkÃ§e metin yaz.\n\n" +
             "Bilmece: " + riddle + "\n" +
             "Beklenen cevap: " + expectedAnswer + "\n" +
-            "Oyuncunun cevabı: " + playerAnswer;
+            "Oyuncunun cevabÄ±: " + playerAnswer;
 
         OllamaRequest requestData = new OllamaRequest
         {
@@ -104,7 +104,7 @@ public class OllamaService : MonoBehaviour
             if (request.result != UnityWebRequest.Result.Success)
             {
                 string error =
-                    "Ollama sunucusuna bağlanılamadı: " + request.error;
+                    "Ollama sunucusuna baÄŸlanÄ±lamadÄ±: " + request.error;
 
                 Debug.LogError(error);
                 onComplete?.Invoke(null, error);
@@ -124,7 +124,7 @@ public class OllamaService : MonoBehaviour
                 if (ollamaResponse == null ||
                     string.IsNullOrWhiteSpace(ollamaResponse.response))
                 {
-                    validationError = "Ollama boş yanıt verdi.";
+                    validationError = "Ollama boÅŸ yanÄ±t verdi.";
                 }
                 else
                 {
@@ -134,7 +134,7 @@ public class OllamaService : MonoBehaviour
                     if (!IsValidRiddleJson(responseJson))
                     {
                         validationError =
-                            "LLM yanıtındaki JSON alanları geçersiz.";
+                            "LLM yanÄ±tÄ±ndaki JSON alanlarÄ± geÃ§ersiz.";
                     }
                     else
                     {
@@ -148,10 +148,10 @@ public class OllamaService : MonoBehaviour
             catch (Exception ex)
             {
                 Debug.LogError(
-                    "JSON ayrıştırma hatası: " + ex.Message
+                    "JSON ayrÄ±ÅŸtÄ±rma hatasÄ±: " + ex.Message
                 );
 
-                validationError = "Ollama yanıtı işlenemedi.";
+                validationError = "Ollama yanÄ±tÄ± iÅŸlenemedi.";
             }
 
             if (validationError != null)
@@ -164,15 +164,15 @@ public class OllamaService : MonoBehaviour
             if (result == null ||
                 string.IsNullOrWhiteSpace(result.owl_response))
             {
-                string error = "LLM geçersiz bilmece yanıtı verdi.";
+                string error = "LLM geÃ§ersiz bilmece yanÄ±tÄ± verdi.";
 
                 Debug.LogError(error);
                 onComplete?.Invoke(null, error);
                 yield break;
             }
 
-            Debug.Log("Bilmece doğru mu? " + result.is_correct);
-            Debug.Log("Bekçi Baykuş: " + result.owl_response);
+            Debug.Log("Bilmece doÄŸru mu? " + result.is_correct);
+            Debug.Log("BekÃ§i BaykuÅŸ: " + result.owl_response);
 
             if (result.is_correct)
             {
@@ -187,14 +187,14 @@ public class OllamaService : MonoBehaviour
                     if (registered)
                     {
                         Debug.Log(
-                            "Bilmece başarıyla kaydedildi: " + riddleId
+                            "Bilmece baÅŸarÄ±yla kaydedildi: " + riddleId
                         );
                     }
                 }
                 else
                 {
                     Debug.LogError(
-                        "RiddleManager bileşeni bulunamadı!"
+                        "RiddleManager bileÅŸeni bulunamadÄ±!"
                     );
                 }
             }
