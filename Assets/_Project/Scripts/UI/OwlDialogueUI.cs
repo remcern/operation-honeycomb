@@ -98,6 +98,7 @@ public class OwlDialogueUI : MonoBehaviour
         isProcessingAnswer = false;
         submitButton.interactable = true;
     }
+
     private string RemoveEmojis(string input)
     {
         if (string.IsNullOrEmpty(input))
@@ -109,7 +110,31 @@ public class OwlDialogueUI : MonoBehaviour
 
         for (int i = 0; i < input.Length; i++)
         {
-            int codePoint = char.ConvertToUtf32(input, i);
+            int codePoint;
+
+            if (char.IsHighSurrogate(input[i]))
+            {
+                if (i + 1 < input.Length &&
+                    char.IsLowSurrogate(input[i + 1]))
+                {
+                    codePoint = char.ConvertToUtf32(input[i], input[i + 1]);
+                    i++;
+                }
+                else
+                {
+                    // Geçersiz Unicode karakterini atla.
+                    continue;
+                }
+            }
+            else if (char.IsLowSurrogate(input[i]))
+            {
+                // Eşleşmeyen düşük surrogate karakterini atla.
+                continue;
+            }
+            else
+            {
+                codePoint = input[i];
+            }
 
             bool isEmoji =
                 (codePoint >= 0x1F000 && codePoint <= 0x1FAFF) ||
@@ -120,13 +145,6 @@ public class OwlDialogueUI : MonoBehaviour
             if (!isEmoji)
             {
                 result.Append(char.ConvertFromUtf32(codePoint));
-            }
-
-            if (char.IsHighSurrogate(input[i]) &&
-                i + 1 < input.Length &&
-                char.IsLowSurrogate(input[i + 1]))
-            {
-                i++;
             }
         }
 
