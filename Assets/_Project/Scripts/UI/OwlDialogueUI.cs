@@ -13,6 +13,8 @@ public class OwlDialogueUI : MonoBehaviour
     [SerializeField] private Button submitButton;
     [SerializeField] private OllamaService ollamaService;
     [SerializeField] private TMP_Text owlResponseText;
+    [SerializeField] private RiddleData currentRiddle;
+    [SerializeField] private RiddleData secondRiddle;
 
     private bool isProcessingAnswer = false;
 
@@ -21,7 +23,8 @@ public class OwlDialogueUI : MonoBehaviour
         if (answerInput == null ||
             submitButton == null ||
             ollamaService == null ||
-            owlResponseText == null)
+            owlResponseText == null ||
+            currentRiddle == null)
         {
             Debug.LogError(
                 "OwlDialogueUI: Inspector bağlantıları eksik!"
@@ -68,12 +71,13 @@ public class OwlDialogueUI : MonoBehaviour
 
         yield return StartCoroutine(
             ollamaService.EvaluateRiddle(
-                "bilmece_1",
-                "Dört ayağı var ama yürüyemez. Nedir?",
-                "masa",
+            currentRiddle.RiddleId,
+            currentRiddle.Question,
+            currentRiddle.ExpectedAnswer,
                 playerAnswer,
                 (result, error) =>
                 {
+
                     if (result != null)
                     {
                         string cleanResponse =
@@ -81,7 +85,20 @@ public class OwlDialogueUI : MonoBehaviour
 
                         owlResponseText.text =
                             "Bekçi Baykuş: " + cleanResponse;
+
+                        if (result.is_correct &&
+                            currentRiddle != secondRiddle &&
+                            secondRiddle != null)
+                        {
+                            currentRiddle = secondRiddle;
+
+                            Debug.Log(
+                                "İkinci bilmeceye geçildi: " +
+                                currentRiddle.RiddleId
+                            );
+                        }
                     }
+
                     else
                     {
                         Debug.LogWarning(

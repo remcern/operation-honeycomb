@@ -930,6 +930,8 @@ MonoBehaviour:
   submitButton: {fileID: 1724556016}
   ollamaService: {fileID: 351892452}
   owlResponseText: {fileID: 1358391910}
+  currentRiddle: {fileID: 11400000, guid: 388387a2033d22949b011662be22b316, type: 2}
+  secondRiddle: {fileID: 11400000, guid: 52db41f978561ad48be81f1918ae43b7, type: 2}
 --- !u!1 &1358391908
 GameObject:
   m_ObjectHideFlags: 0
