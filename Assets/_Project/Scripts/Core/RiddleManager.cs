@@ -32,7 +32,16 @@ public class RiddleManager : MonoBehaviour
         {
             return false;
         }
+        bool riddleExists = riddlePool != null &&
+        riddlePool.Exists(riddle =>
+        riddle != null &&
+        riddle.RiddleId == riddleId);
 
+        if (!riddleExists)
+        {
+            Debug.LogWarning("Bilmece havuzunda bulunamadý: " + riddleId);
+            return false;
+        }
         if (!solvedRiddles.Add(riddleId))
         {
             Debug.LogWarning(
