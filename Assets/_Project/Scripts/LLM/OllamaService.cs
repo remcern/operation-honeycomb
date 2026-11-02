@@ -1,8 +1,10 @@
 
+
 using System;
 using System.Collections;
 using System.Text;
-using System.Text.RegularExpressions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -19,43 +21,68 @@ public class OllamaService : MonoBehaviour
         public string format;
     }
 
-    [Serializable]
-    private class OllamaResponse
-    {
-        public string response;
-    }
-
-    [Serializable]
     public class RiddleResult
     {
         public bool is_correct;
         public string owl_response;
     }
 
-    private bool IsValidRiddleJson(string responseJson)
+    private bool TryParseRiddleResult(
+        string responseJson,
+        out RiddleResult result)
     {
-        if (string.IsNullOrWhiteSpace(responseJson))
+        result = null;
+
+        try
+        {
+            JObject json = JObject.Parse(responseJson);
+
+            JToken correctToken = json["is_correct"];
+            JToken responseToken = json["owl_response"];
+
+            if (correctToken == null ||
+                correctToken.Type != JTokenType.Boolean)
+            {
+                return false;
+            }
+
+            if (responseToken == null ||
+                responseToken.Type != JTokenType.String)
+            {
+                return false;
+            }
+
+            string owlResponse = responseToken.Value<string>();
+
+            if (string.IsNullOrWhiteSpace(owlResponse))
+            {
+                return false;
+            }
+
+            result = new RiddleResult
+            {
+                is_correct = correctToken.Value<bool>(),
+                owl_response = owlResponse
+            };
+
+            return true;
+        }
+        catch (JsonException ex)
+        {
+            Debug.LogWarning("Geçersiz JSON: " + ex.Message);
             return false;
-
-        bool validCorrect = Regex.IsMatch(
-            responseJson,
-            "\"is_correct\"\\s*:\\s*(true|false)\\s*[,}]"
-        );
-
-        bool validResponse = Regex.IsMatch(
-            responseJson,
-            "\"owl_response\"\\s*:\\s*\"(?:\\\\.|[^\"\\\\])*\"\\s*[,}]"
-        );
-
-
-        return validCorrect && validResponse;
+        }
+        catch (ArgumentException ex)
+        {
+            Debug.LogWarning("JSON veri hatası: " + ex.Message);
+            return false;
+        }
     }
 
     private void Start()
     {
         Debug.Log("OllamaService hazır. Oyuncunun cevabı bekleniyor.");
     }
-
 
     public IEnumerator EvaluateRiddle(
         string riddleId,
@@ -76,7 +103,7 @@ public class OllamaService : MonoBehaviour
             "6. Yalnızca is_correct ve owl_response alanlarını içeren JSON döndür.\n" +
             "7. is_correct mutlaka true veya false olmalıdır.\n" +
             "8. owl_response kısa, anlaşılır ve doğal Türkçe olmalıdır.\n" +
-            "9. Emoji, gereksiz semboller veya anlamsız karakterler kullanma.Yalnızca türkçe metin yaz.\n\n" +
+            "9. Emoji, gereksiz semboller veya anlamsız karakterler kullanma. Yalnızca Türkçe metin yaz.\n\n" +
             "Bilmece: " + riddle + "\n" +
             "Beklenen cevap: " + expectedAnswer + "\n" +
             "Oyuncunun cevabı: " + playerAnswer;
@@ -89,8 +116,8 @@ public class OllamaService : MonoBehaviour
             format = "json"
         };
 
-        string json = JsonUtility.ToJson(requestData);
-        byte[] body = Encoding.UTF8.GetBytes(json);
+        string requestJson = JsonConvert.SerializeObject(requestData);
+        byte[] body = Encoding.UTF8.GetBytes(requestJson);
 
         using (UnityWebRequest request = new UnityWebRequest(ApiUrl, "POST"))
         {
@@ -116,41 +143,33 @@ public class OllamaService : MonoBehaviour
 
             try
             {
-                OllamaResponse ollamaResponse =
-                    JsonUtility.FromJson<OllamaResponse>(
-                        request.downloadHandler.text
-                    );
+                JObject ollamaResponse =
+                    JObject.Parse(request.downloadHandler.text);
 
-                if (ollamaResponse == null ||
-                    string.IsNullOrWhiteSpace(ollamaResponse.response))
+                JToken responseToken = ollamaResponse["response"];
+
+                if (responseToken == null ||
+                    responseToken.Type != JTokenType.String ||
+                    string.IsNullOrWhiteSpace(responseToken.Value<string>()))
                 {
-                    validationError = "Ollama boş yanıt verdi.";
+                    validationError = "Ollama boş veya geçersiz yanıt verdi.";
                 }
-                else
+                else if (!TryParseRiddleResult(
+                    responseToken.Value<string>(),
+                    out result))
                 {
-                    string responseJson = ollamaResponse.response;
-
-
-                    if (!IsValidRiddleJson(responseJson))
-                    {
-                        validationError =
-                            "LLM yanıtındaki JSON alanları geçersiz.";
-                    }
-                    else
-                    {
-                        result = JsonUtility.FromJson<RiddleResult>(
-                            responseJson
-                        );
-                    }
-
+                    validationError =
+                        "LLM yanıtındaki JSON alanları geçersiz.";
                 }
             }
-            catch (Exception ex)
+            catch (JsonException ex)
             {
-                Debug.LogError(
-                    "JSON ayrıştırma hatası: " + ex.Message
-                );
-
+                Debug.LogWarning("Ollama JSON hatası: " + ex.Message);
+                validationError = "Ollama yanıtı işlenemedi.";
+            }
+            catch (ArgumentException ex)
+            {
+                Debug.LogWarning("Ollama veri hatası: " + ex.Message);
                 validationError = "Ollama yanıtı işlenemedi.";
             }
 
@@ -158,16 +177,6 @@ public class OllamaService : MonoBehaviour
             {
                 Debug.LogError(validationError);
                 onComplete?.Invoke(null, validationError);
-                yield break;
-            }
-
-            if (result == null ||
-                string.IsNullOrWhiteSpace(result.owl_response))
-            {
-                string error = "LLM geçersiz bilmece yanıtı verdi.";
-
-                Debug.LogError(error);
-                onComplete?.Invoke(null, error);
                 yield break;
             }
 
