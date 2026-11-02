@@ -441,6 +441,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RiddleManager
   requiredCorrectAnswers: 2
+  riddlePool:
+  - {fileID: 11400000, guid: 388387a2033d22949b011662be22b316, type: 2}
+  - {fileID: 11400000, guid: 52db41f978561ad48be81f1918ae43b7, type: 2}
 --- !u!1 &431273400
 GameObject:
   m_ObjectHideFlags: 0

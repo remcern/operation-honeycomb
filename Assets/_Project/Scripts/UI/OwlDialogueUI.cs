@@ -14,14 +14,17 @@ public class OwlDialogueUI : MonoBehaviour
     [SerializeField] private OllamaService ollamaService;
     [SerializeField] private TMP_Text owlResponseText;
     [SerializeField] private TMP_Text riddleQuestionText;
-    [SerializeField] private RiddleData currentRiddle;
-    [SerializeField] private RiddleData secondRiddle;
+    private RiddleData currentRiddle;
     [SerializeField] private RiddleManager riddleManager;
     private bool isProcessingAnswer = false;
     private bool hasCompletedRiddles = false;
 
     private void Start()
+
     {
+        currentRiddle = riddleManager != null
+    ? riddleManager.GetRandomRiddle()
+    : null;
         if (answerInput == null ||
             submitButton == null ||
             ollamaService == null ||
@@ -91,17 +94,21 @@ public class OwlDialogueUI : MonoBehaviour
 
                         owlResponseText.text =
                             "Bekçi Baykuş: " + cleanResponse;
-
-                        if (result.is_correct &&
-                            currentRiddle != secondRiddle &&
-                            secondRiddle != null)
+                        if (result.is_correct && !riddleManager.AllRiddlesSolved)
                         {
-                            currentRiddle = secondRiddle;
-                            riddleQuestionText.text = currentRiddle.Question;
-                            Debug.Log(
-                                "İkinci bilmeceye geçildi: " +
-                                currentRiddle.RiddleId
-                            );
+                            RiddleData nextRiddle = riddleManager.GetRandomRiddle();
+
+                            if (nextRiddle != null)
+                            {
+                                currentRiddle = nextRiddle;
+                                riddleQuestionText.text = currentRiddle.Question;
+
+                                Debug.Log("Yeni bilmece seçildi: " + currentRiddle.RiddleId);
+                            }
+                            else
+                            {
+                                Debug.LogWarning("Yeni bilmece seçilemedi!");
+                            }
                         }
                     }
 
