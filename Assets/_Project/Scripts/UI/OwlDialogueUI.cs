@@ -13,10 +13,12 @@ public class OwlDialogueUI : MonoBehaviour
     [SerializeField] private Button submitButton;
     [SerializeField] private OllamaService ollamaService;
     [SerializeField] private TMP_Text owlResponseText;
+    [SerializeField] private TMP_Text riddleQuestionText;
     [SerializeField] private RiddleData currentRiddle;
     [SerializeField] private RiddleData secondRiddle;
-
+    [SerializeField] private RiddleManager riddleManager;
     private bool isProcessingAnswer = false;
+    private bool hasCompletedRiddles = false;
 
     private void Start()
     {
@@ -24,7 +26,9 @@ public class OwlDialogueUI : MonoBehaviour
             submitButton == null ||
             ollamaService == null ||
             owlResponseText == null ||
-            currentRiddle == null)
+            riddleQuestionText == null ||
+            currentRiddle == null
+            || riddleManager == null)
         {
             Debug.LogError(
                 "OwlDialogueUI: Inspector bağlantıları eksik!"
@@ -35,6 +39,8 @@ public class OwlDialogueUI : MonoBehaviour
         }
 
         submitButton.onClick.AddListener(SubmitAnswer);
+
+        riddleQuestionText.text = currentRiddle.Question;
 
         Debug.Log("Bekçi Baykuş arayüzü hazır.");
     }
@@ -91,7 +97,7 @@ public class OwlDialogueUI : MonoBehaviour
                             secondRiddle != null)
                         {
                             currentRiddle = secondRiddle;
-
+                            riddleQuestionText.text = currentRiddle.Question;
                             Debug.Log(
                                 "İkinci bilmeceye geçildi: " +
                                 currentRiddle.RiddleId
@@ -111,9 +117,18 @@ public class OwlDialogueUI : MonoBehaviour
                 }
             )
         );
+        if (riddleManager.AllRiddlesSolved)
+        {
+            hasCompletedRiddles = true;
+
+            riddleQuestionText.text = "Tüm bilmeceleri çözdün!";
+            answerInput.text = "";
+            answerInput.interactable = false;
+            Debug.Log("Tüm bilmeceler tamamlandı. Cevap gönderme kapatıldı.");
+        }
 
         isProcessingAnswer = false;
-        submitButton.interactable = true;
+        submitButton.interactable = !hasCompletedRiddles;
     }
 
     private string RemoveEmojis(string input)
