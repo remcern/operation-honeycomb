@@ -1072,8 +1072,6 @@ MonoBehaviour:
   ollamaService: {fileID: 351892452}
   owlResponseText: {fileID: 1358391910}
   riddleQuestionText: {fileID: 1070858191}
-  currentRiddle: {fileID: 11400000, guid: 388387a2033d22949b011662be22b316, type: 2}
-  secondRiddle: {fileID: 11400000, guid: 52db41f978561ad48be81f1918ae43b7, type: 2}
   riddleManager: {fileID: 351892454}
 --- !u!1 &1358391908
 GameObject:
