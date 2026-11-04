@@ -394,8 +394,9 @@ GameObject:
   - component: {fileID: 351892453}
   - component: {fileID: 351892452}
   - component: {fileID: 351892454}
+  - component: {fileID: 351892455}
   m_Layer: 0
-  m_Name: OdlamaManager
+  m_Name: OllamaManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -444,6 +445,19 @@ MonoBehaviour:
   riddlePool:
   - {fileID: 11400000, guid: 388387a2033d22949b011662be22b316, type: 2}
   - {fileID: 11400000, guid: 52db41f978561ad48be81f1918ae43b7, type: 2}
+--- !u!114 &351892455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 351892450}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0ac4ebb53e0ba342b424482e763c000, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RiddleCompletionEventTest
+  riddleManager: {fileID: 351892454}
 --- !u!1 &431273400
 GameObject:
   m_ObjectHideFlags: 0
