@@ -6457,6 +6457,61 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 51c37c5ae454e674c83e7995d1532c59, type: 3}
   m_PrefabInstance: {fileID: 1157439677}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1161505681
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1161505683}
+  - component: {fileID: 1161505682}
+  m_Layer: 0
+  m_Name: GameGuard
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1161505682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1161505681}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77fde20997b19574380d7ea9300f2ce4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OperationHoneycomb.Characters.GameGuard
+  bizz: {fileID: 1778046771}
+  bumbu: {fileID: 1450898307}
+  lever: {fileID: 104735482}
+  fenceGate: {fileID: 1324489882}
+  owlDoor: {fileID: 684487094}
+  mainCamera: {fileID: 330585545}
+  checkInterval: 0.3
+  fallLimitY: -5
+  navSnapDistance: 3
+  messageSeconds: 8
+  enableSelfTest: 1
+--- !u!4 &1161505683
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1161505681}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.088, y: 1.69002, z: 35.75}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1190010759
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10108,6 +10163,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::OperationHoneycomb.Characters.CompanionCommandInput
   companion: {fileID: 1778046771}
   leverObject: {fileID: 104735482}
+  cooldown: 0.6
 --- !u!114 &1450898309
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12474,3 +12530,4 @@ SceneRoots:
   - {fileID: 2058176415}
   - {fileID: 1135495080}
   - {fileID: 38512242}
+  - {fileID: 1161505683}
