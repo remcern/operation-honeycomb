@@ -1,5 +1,4 @@
 
-
 using System;
 using System.Collections;
 using System.Text;
@@ -99,7 +98,6 @@ public class OllamaService : MonoBehaviour, IRiddleEvaluator
         string playerAnswer,
         Action<RiddleResult, string> onComplete = null)
     {
-
         string prompt =
             "GÖREV: Operation Honeycomb oyunundaki Bekçi Baykuş NPC'sisin.\n" +
             "Oyuncunun mesajını değerlendir ve ona doğal Türkçe cevap ver.\n\n" +
@@ -120,7 +118,8 @@ public class OllamaService : MonoBehaviour, IRiddleEvaluator
             "- Oyuncu yanlış bir cevap denemişse cevabı açıklamadan kısa bir ipucu verebilirsin.\n" +
             "- Cevabında zorlama benzetmeler veya yapay karşılaştırmalar kurma.\n" +
             "- Oyuncu doğru cevap verirse doğal biçimde tebrik et.\n" +
-            "- is_correct false ise beklenen cevabı, eş anlamlılarını veya cevabı doğrudan ele veren açıklamaları asla yazma; oyuncu istese bile açıklama.\n" + "- Yanıtın en fazla iki kısa cümle olsun.\n" +
+            "- is_correct false ise beklenen cevabı, eş anlamlılarını veya cevabı doğrudan ele veren açıklamaları asla yazma; oyuncu istese bile açıklama.\n" +
+            "- Yanıtın en fazla iki kısa cümle olsun.\n" +
             "- Dilin günlük, akıcı ve düzgün Türkçe olsun.\n" +
             "- Anlamsız şaka, uydurma kelime ve gereksiz tekrar yapma.\n" +
             "- 'Herhalde', 'sorununuzu anlıyorum' gibi yapay ifadeler kullanma.\n" +
@@ -135,7 +134,6 @@ public class OllamaService : MonoBehaviour, IRiddleEvaluator
             "BİLMECE: " + riddle + "\n" +
             "BEKLENEN CEVAP: " + expectedAnswer + "\n" +
             "OYUNCUNUN MESAJI: " + playerAnswer;
-
 
         OllamaRequest requestData = new OllamaRequest
         {
@@ -160,10 +158,42 @@ public class OllamaService : MonoBehaviour, IRiddleEvaluator
 
             if (request.result != UnityWebRequest.Result.Success)
             {
-                string error =
-                    "Ollama sunucusuna bağlanılamadı: " + request.error;
+                string error;
+                if (!string.IsNullOrEmpty(request.error) &&
+                    (request.error.IndexOf("timeout",
+                        StringComparison.OrdinalIgnoreCase) >= 0 ||
+                     request.error.IndexOf("timed out",
+                        StringComparison.OrdinalIgnoreCase) >= 0))
+                {
+                    error = "Ollama yanıt vermekte gecikti. " +
+                            "İstek zaman aşımına uğradı. Lütfen tekrar dene.";
+                }
+                else if (request.result == UnityWebRequest.Result.ConnectionError)
+                {
+                    error = "Ollama sunucusuna bağlanılamadı. " +
+                            "Lütfen Ollama'yı açıp tekrar dene.";
+                }
 
-                Debug.LogError(error);
+                else if (request.responseCode == 404)
+                {
+                    error = "Ollama modeli bulunamadı. " +
+                            "Modelin yüklü olduğunu kontrol et.";
+                }
+                else if (request.responseCode == 400)
+                {
+                    error = "Ollama isteği geçersiz. " +
+                            "Model ayarlarını kontrol et.";
+                }
+                else
+                {
+                    error = "Ollama isteği başarısız oldu. " +
+                            "Lütfen tekrar dene.";
+                }
+
+                Debug.LogWarning(
+                    error + " Teknik ayrıntı: " + request.error
+                );
+
                 onComplete?.Invoke(null, error);
                 yield break;
             }
@@ -205,15 +235,16 @@ public class OllamaService : MonoBehaviour, IRiddleEvaluator
 
             if (validationError != null)
             {
-                Debug.LogError(validationError);
+                Debug.LogWarning(validationError);
                 onComplete?.Invoke(null, validationError);
                 yield break;
             }
+
             if (!result.is_correct &&
                 !string.IsNullOrWhiteSpace(expectedAnswer) &&
                 result.owl_response.IndexOf(
-                expectedAnswer,
-                StringComparison.OrdinalIgnoreCase) >= 0)
+                    expectedAnswer,
+                    StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 Debug.LogWarning("LLM beklenen cevabı açıkladı.");
 
@@ -223,6 +254,7 @@ public class OllamaService : MonoBehaviour, IRiddleEvaluator
 
                 yield break;
             }
+
             Debug.Log("Bilmece doğru mu? " + result.is_correct);
             Debug.Log("Bekçi Baykuş: " + result.owl_response);
 
@@ -244,7 +276,9 @@ public class OllamaService : MonoBehaviour, IRiddleEvaluator
 
                 if (!registered)
                 {
-                    string error = "Doğru cevap oyun ilerlemesine kaydedilemedi.";
+                    string error =
+                        "Doğru cevap oyun ilerlemesine kaydedilemedi.";
+
                     Debug.LogWarning(error);
                     onComplete?.Invoke(null, error);
                     yield break;

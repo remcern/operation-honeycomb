@@ -1,0 +1,9 @@
+BIZZ OTONOM KAHRAMAN - TEMEL SENARYO TESTI
+Tarih: 29.10.2026
+Yontem: NavMesh tabanli yol bulma, durum makinesi, Raycast sensoru
+Deneme sayisi: 30 (seed 12345, rastgele baslangic konumlari)
+Basari: 30/30 (%100.0)
+Ortalama sure: 3.06 sn (Time Scale 2 ile olculdu)
+En kisa: 1.98 sn
+En uzun: 4.38 sn
+Kosullar: Engel yok, Bumbu hareketsiz, kapi kapali

@@ -44,6 +44,7 @@ public class OwlDialogueUI : MonoBehaviour
         submitButton.onClick.AddListener(SubmitAnswer);
 
         riddleQuestionText.text = currentRiddle.Question;
+        owlResponseText.text = "Bekçi Baykuş: Yeni bilmeceni bekliyorum!";
 
         Debug.Log("Bekçi Baykuş arayüzü hazır.");
     }
@@ -101,7 +102,11 @@ public class OwlDialogueUI : MonoBehaviour
                             if (nextRiddle != null)
                             {
                                 currentRiddle = nextRiddle;
+
                                 riddleQuestionText.text = currentRiddle.Question;
+
+                                owlResponseText.text =
+                                    "Bekçi Baykuş: Yeni bilmeceni bekliyorum!";
 
                                 Debug.Log("Yeni bilmece seçildi: " + currentRiddle.RiddleId);
                             }
@@ -119,7 +124,10 @@ public class OwlDialogueUI : MonoBehaviour
                         );
 
                         owlResponseText.text =
-                            "Bekçi Baykuş şu anda cevap veremiyor.";
+                            "Bekçi Baykuş: " +
+                            (string.IsNullOrWhiteSpace(error)
+                                ? "Şu anda cevap veremiyorum. Lütfen tekrar dene."
+                                : error);
                     }
                 }
             )
@@ -129,12 +137,17 @@ public class OwlDialogueUI : MonoBehaviour
             hasCompletedRiddles = true;
 
             riddleQuestionText.text = "Tüm bilmeceleri çözdün!";
+            owlResponseText.text =
+                "Bekçi Baykuş: Tebrikler! Bütün bilmeceleri başarıyla tamamladın.";
+
             answerInput.text = "";
             answerInput.interactable = false;
+
             Debug.Log("Tüm bilmeceler tamamlandı. Cevap gönderme kapatıldı.");
         }
 
         isProcessingAnswer = false;
+        answerInput.interactable = !hasCompletedRiddles;
         submitButton.interactable = !hasCompletedRiddles;
     }
 
