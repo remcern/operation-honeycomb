@@ -18,7 +18,43 @@ public class OwlDialogueUI : MonoBehaviour
     [SerializeField] private RiddleManager riddleManager;
     private bool isProcessingAnswer = false;
     private bool hasCompletedRiddles = false;
+    [Header("Baykus Etkilesimi")]
+    [SerializeField] private Transform playerTransform;
+    [SerializeField] private Transform owlSpot;
+    [SerializeField] private CanvasGroup dialogueCanvasGroup;
+    [SerializeField] private float interactionDistance = 5f;
+    private void Awake()
+    {
+        SetDialogueVisible(false);
+    }
 
+    private void Update()
+    {
+        if (playerTransform == null || owlSpot == null ||
+            dialogueCanvasGroup == null)
+            return;
+
+        Vector3 playerPosition = playerTransform.position;
+        Vector3 owlPosition = owlSpot.position;
+
+        // Yalnizca yatay uzakligi kontrol et.
+        playerPosition.y = 0f;
+        owlPosition.y = 0f;
+
+        float distance = Vector3.Distance(playerPosition, owlPosition);
+
+        SetDialogueVisible(distance <= interactionDistance);
+    }
+
+    private void SetDialogueVisible(bool visible)
+    {
+        if (dialogueCanvasGroup == null)
+            return;
+
+        dialogueCanvasGroup.alpha = visible ? 1f : 0f;
+        dialogueCanvasGroup.interactable = visible;
+        dialogueCanvasGroup.blocksRaycasts = visible;
+    }
     private void Start()
 
     {
