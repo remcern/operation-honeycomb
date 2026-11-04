@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Riddle_01
   m_EditorClassIdentifier: Assembly-CSharp::RiddleData
   riddleId: bilmece_1
-  question: "D\xF6rt aya\u011F\u0131 var ama y\xFCr\xFCyemez. Nedir?"
-  expectedAnswer: masa
+  question: "Beni g\xF6remezsin, ama dallar\u0131 e\u011Fdi\u011Fimde geldi\u011Fimi anlars\u0131n. Neyim?\r\n"
+  expectedAnswer: "r\xFCzgar"

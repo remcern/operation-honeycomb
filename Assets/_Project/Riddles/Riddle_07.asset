@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f1997a826c81b64b8eb1b477bbed470, type: 3}
+  m_Name: Riddle_07
+  m_EditorClassIdentifier: Assembly-CSharp::RiddleData
+  riddleId: bilmece_07
+  question: "Ormanda yata\u011F\u0131m var ama hi\xE7 uyumam. Ta\u015Flar\u0131n aras\u0131ndan durmadan akar\u0131m. Neyim?"
+  expectedAnswer: dere
