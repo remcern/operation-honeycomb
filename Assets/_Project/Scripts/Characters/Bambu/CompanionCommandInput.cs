@@ -74,7 +74,7 @@ namespace OperationHoneycomb.Characters
         private void Notice(string text)
         {
             _notice = text;
-            _noticeUntil = Time.unscaledTime + 2f;
+         _noticeUntil = Time.unscaledTime + 6f;
         }
 
         private void OnGUI()
@@ -84,7 +84,14 @@ namespace OperationHoneycomb.Characters
             GUI.Label(new Rect(10, 32, 500, 25), "Bizz durumu: " + companion.CurrentStateName);
 
             if (!string.IsNullOrEmpty(_notice) && Time.unscaledTime < _noticeUntil)
-                GUI.Label(new Rect(10, 54, 500, 25), _notice);
+                          {
+                var style = new GUIStyle(GUI.skin.label);
+                style.fontSize = 22;
+                style.fontStyle = FontStyle.Bold;
+                style.alignment = TextAnchor.MiddleCenter;
+                style.normal.textColor = new Color(1f, 0.85f, 0.3f);
+                GUI.Label(new Rect(0, Screen.height - 120f, Screen.width, 40f), _notice, style);
+            }
         }
     }
 }
