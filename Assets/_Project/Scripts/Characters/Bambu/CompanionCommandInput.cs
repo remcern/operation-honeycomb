@@ -29,6 +29,7 @@ namespace OperationHoneycomb.Characters
         {
             Keyboard kb = Keyboard.current;
             if (kb == null) return;                      // klavye yok: sessizce çık
+            if (UiTypingGuard.IsTyping) return;          // yazı kutusuna yazılırken E/Q yok sayılır
             if (companion == null || _lever == null) return;
 
             if (kb.eKey.wasPressedThisFrame) TryOrder();

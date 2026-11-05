@@ -7,7 +7,8 @@ namespace OperationHoneycomb.Characters
 {
     /// <summary>Oyunun çökmesini önleyen koruyucu. Açılışta eksik atamaları tarar, çalışırken
     /// Bizz ve Bumbu'yu güvenli bölgede tutar, yakalanmamış hataları ekranda bildirir.
-    /// B/N tuşlarıyla koruma mekanizması kendi kendine sınanabilir (rapor için).</summary>
+    /// B/N tuşlarıyla koruma mekanizması kendi kendine sınanabilir (rapor için).
+    /// Yazı kutusuna yazılırken sınama tuşları yok sayılır.</summary>
     public sealed class GameGuard : MonoBehaviour
     {
         [Header("Kontrol edilecek nesneler")]
@@ -150,7 +151,7 @@ namespace OperationHoneycomb.Characters
         private void HandleSelfTestKeys()
         {
             Keyboard kb = Keyboard.current;
-            if (kb == null) return;
+            if (kb == null || UiTypingGuard.IsTyping) return;   // yazı kutusuna yazılırken yok say
 
             if (kb.bKey.wasPressedThisFrame) ThrowBizzOffMesh();
             if (kb.nKey.wasPressedThisFrame) ThrowBumbuIntoPit();

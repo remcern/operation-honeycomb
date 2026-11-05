@@ -11,9 +11,10 @@ using UnityEngine.InputSystem;
 namespace OperationHoneycomb.Characters
 {
     /// <summary>Bizz'in davranışını tekrarlanabilir biçimde test eder.
-    /// T tuşu: rastgele başlangıç noktalarından N deneme yapar, başarı oranını
+    /// Shift+T: rastgele başlangıç noktalarından N deneme yapar, başarı oranını
     /// ve ortalama süreyi ekrana, Console'a ve CSV dosyasına yazar.
-    /// "Use Obstacle" açıksa her denemede Bumbu, Bizz ile mandal arasına konur.</summary>
+    /// "Use Obstacle" açıksa her denemede Bumbu, Bizz ile mandal arasına konur.
+    /// Yazı kutusuna yazılırken test başlamaz.</summary>
     public sealed class CompanionTestRunner : MonoBehaviour
     {
         [Header("Bağlantılar")]
@@ -60,7 +61,7 @@ namespace OperationHoneycomb.Characters
         private bool _running;
         private int _currentTrial;
         private float _previousTimeScale = 1f;
-        private string _summary = "T tusu: testi baslat";
+        private string _summary = "Shift+T: testi baslat";
 
         private void Awake()
         {
@@ -96,8 +97,13 @@ namespace OperationHoneycomb.Characters
 
         private void Update()
         {
-            if (_running || Keyboard.current == null) return;
-            if (Keyboard.current.tKey.wasPressedThisFrame) StartCoroutine(RunTests());
+            Keyboard kb = Keyboard.current;
+            if (_running || kb == null) return;
+            if (UiTypingGuard.IsTyping) return;   // yazı kutusuna yazarken test başlamasın
+
+            // Yanlışlıkla başlamasın diye Shift + T
+            bool shift = kb.leftShiftKey.isPressed || kb.rightShiftKey.isPressed;
+            if (shift && kb.tKey.wasPressedThisFrame) StartCoroutine(RunTests());
         }
 
         private IEnumerator RunTests()
@@ -294,7 +300,7 @@ namespace OperationHoneycomb.Characters
             if (_running)
                 status = "TEST CALISIYOR (" + scenarioName + "): deneme " + _currentTrial + "/" + trialCount;
             else
-                status = "T: Bizz testini baslat [" + scenarioName + ", " + trialCount + " deneme]";
+                status = "Shift+T: Bizz testini baslat [" + scenarioName + ", " + trialCount + " deneme]";
 
             GUI.Label(new Rect(10, 60, 900, 25), status);
 

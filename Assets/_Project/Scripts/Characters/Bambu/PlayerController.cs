@@ -4,7 +4,8 @@ using UnityEngine.InputSystem;
 namespace OperationHoneycomb.Characters
 {
     /// <summary>Bumbu'nun WASD ile hareketi. Hareket kameranın baktığı yöne göredir.
-    /// CharacterController sayesinde çit ve duvarların içinden geçemez.</summary>
+    /// CharacterController sayesinde çit ve duvarların içinden geçemez.
+    /// Yazı kutusuna yazılırken hareket girdisi yok sayılır.</summary>
     [RequireComponent(typeof(CharacterController))]
     public sealed class PlayerController : MonoBehaviour
     {
@@ -50,6 +51,7 @@ namespace OperationHoneycomb.Characters
         {
             Keyboard kb = Keyboard.current;
             if (kb == null) return Vector2.zero;
+            if (UiTypingGuard.IsTyping) return Vector2.zero;   // yazı kutusuna yazarken yürüme
 
             float x = (kb.dKey.isPressed ? 1f : 0f) - (kb.aKey.isPressed ? 1f : 0f);
             float y = (kb.wKey.isPressed ? 1f : 0f) - (kb.sKey.isPressed ? 1f : 0f);
