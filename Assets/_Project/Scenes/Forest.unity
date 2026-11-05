@@ -6813,7 +6813,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c79a18be80c113e4897afdc934e0f8d5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1903291838}
   m_SourcePrefab: {fileID: 100100000, guid: c79a18be80c113e4897afdc934e0f8d5, type: 3}
 --- !u!4 &1188973270 stripped
 Transform:
@@ -11883,6 +11886,26 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0a499ab0ee85c874bb4652f3c3361275, type: 3}
+--- !u!1 &1903291837 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: c79a18be80c113e4897afdc934e0f8d5, type: 3}
+  m_PrefabInstance: {fileID: 1188973269}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1903291838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1903291837}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05b06a1d20e0fcf468d931a60b5fab79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OperationHoneycomb.Characters.SpeechBubble
+  offset: {x: 0, y: 2.2, z: 0}
+  maxWidth: 300
+  fontSize: 18
 --- !u!1 &1907199276
 GameObject:
   m_ObjectHideFlags: 0
@@ -12159,6 +12182,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 168233891}
     - target: {fileID: 6575700203214520661, guid: 2eb5c2a6f37559c4f9c54846351b0edd, type: 3}
+      propertyPath: owlSpeechBubble
+      value: 
+      objectReference: {fileID: 1903291838}
+    - target: {fileID: 6575700203214520661, guid: 2eb5c2a6f37559c4f9c54846351b0edd, type: 3}
       propertyPath: playerTransform
       value: 
       objectReference: {fileID: 1450898307}
@@ -12166,6 +12193,14 @@ PrefabInstance:
       propertyPath: dialogueCanvasGroup
       value: 
       objectReference: {fileID: 737567376}
+    - target: {fileID: 8429035165681279400, guid: 2eb5c2a6f37559c4f9c54846351b0edd, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8512677182520751953, guid: 2eb5c2a6f37559c4f9c54846351b0edd, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
