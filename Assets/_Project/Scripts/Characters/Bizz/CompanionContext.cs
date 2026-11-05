@@ -2,11 +2,12 @@ using UnityEngine;
 
 namespace OperationHoneycomb.Characters
 {
-    /// <summary>Bizz'in durumlarının ortak kullandığı bilgi çantası.</summary>
+    /// <summary>Bizz'in durumlarının ortak kullandığı bilgi çantası.
+    /// Hareket, somut sınıf yerine ICompanionMover arayüzü üzerinden kullanılır.</summary>
     public sealed class CompanionContext
     {
         public Transform Self { get; private set; }
-        public CompanionAgent Agent { get; private set; }
+        public ICompanionMover Agent { get; private set; }
         public ICompanionSensor Sensor { get; private set; }
 
         public Transform FollowTarget { get; set; }
@@ -23,7 +24,7 @@ namespace OperationHoneycomb.Characters
         public bool OrderCompleted { get; set; }
         public bool OrderFailed { get; set; }
 
-        public CompanionContext(Transform self, CompanionAgent agent, ICompanionSensor sensor)
+        public CompanionContext(Transform self, ICompanionMover agent, ICompanionSensor sensor)
         {
             Self = self;
             Agent = agent;
