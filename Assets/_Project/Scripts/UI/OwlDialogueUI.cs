@@ -84,7 +84,29 @@ public class OwlDialogueUI : MonoBehaviour
 
         Debug.Log("Bekçi Baykuş arayüzü hazır.");
     }
+    private void OnEnable()
+    {
+        if (answerInput != null)
+        {
+            answerInput.onSubmit.AddListener(OnAnswerSubmitted);
+        }
+    }
 
+    private void OnDisable()
+    {
+        if (answerInput != null)
+        {
+            answerInput.onSubmit.RemoveListener(OnAnswerSubmitted);
+        }
+    }
+
+    private void OnAnswerSubmitted(string value)
+    {
+        if (isProcessingAnswer || hasCompletedRiddles)
+            return;
+
+        SubmitAnswer();
+    }
     private void SubmitAnswer()
     {
         if (isProcessingAnswer)
@@ -138,6 +160,7 @@ public class OwlDialogueUI : MonoBehaviour
                             if (nextRiddle != null)
                             {
                                 currentRiddle = nextRiddle;
+                                answerInput.text = "";
 
                                 riddleQuestionText.text = currentRiddle.Question;
 
