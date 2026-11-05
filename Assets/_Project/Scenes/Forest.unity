@@ -595,6 +595,8 @@ MonoBehaviour:
   walkSpeed: 3
   gap: 0.5
   lineDuration: 2.2
+  heartScale: 0.9
+  heartColor: {r: 1, g: 0.25, b: 0.5, a: 1}
   onFinaleStarted:
     m_PersistentCalls:
       m_Calls: []
@@ -1497,7 +1499,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 3
       minMaxState: 0
-      scalar: 0.5
+      scalar: 0.9
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -1623,7 +1625,7 @@ ParticleSystem:
     serializedVersion: 6
     enabled: 1
     type: 4
-    angle: 8
+    angle: 12
     length: 5
     boxThickness: {x: 0, y: 0, z: 0}
     radiusThickness: 1
@@ -1673,7 +1675,7 @@ ParticleSystem:
     sphericalDirectionAmount: 0
     randomPositionAmount: 0
     radius:
-      value: 0.1
+      value: 0.15
       mode: 0
       spread: 0
       speed:
@@ -1720,7 +1722,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 3
       minMaxState: 0
-      scalar: 30
+      scalar: 45
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -4900,7 +4902,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2139241453}
-  - {fileID: 1482632881}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!208 &684487093
@@ -10695,13 +10696,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1482632880}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.775, y: -0.132, z: -0.8}
-  m_LocalScale: {x: 0.25, y: 0.4, z: 0.25}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -4.17, y: 1.17, z: 34.6}
+  m_LocalScale: {x: 0.25, y: 1.2, z: 0.25}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 321106792}
-  m_Father: {fileID: 684487092}
+  m_Father: {fileID: 1762004002}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1482632882
 MeshRenderer:
@@ -11436,6 +11437,38 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 51c37c5ae454e674c83e7995d1532c59, type: 3}
   m_PrefabInstance: {fileID: 1705515157}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1762004001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1762004002}
+  m_Layer: 0
+  m_Name: TorchGroup
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1762004002
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1762004001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1482632881}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1778046770
 GameObject:
   m_ObjectHideFlags: 0
@@ -12979,3 +13012,4 @@ SceneRoots:
   - {fileID: 806357570}
   - {fileID: 1938558041}
   - {fileID: 162131550}
+  - {fileID: 1762004002}
