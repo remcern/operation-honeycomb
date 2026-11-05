@@ -1,0 +1,10 @@
+BIZZ OTONOM KAHRAMAN - FINAL SENARYO TESTI
+Tarih: 05.11.2026
+Yontem: NavMesh tabanli yol bulma, durum makinesi, Raycast sensoru
+Deneme sayisi: 30 (seed 12345, rastgele baslangic konumlari)
+Basari: 30/30 (%100.0)
+Ortalama sure: 2.31 sn (Time Scale 2 ile olculdu)
+En kisa: 1.65 sn
+En uzun: 3.27 sn
+Kosullar: Tum sahne dekoruyla, son oyun ayarlariyla (engel yok)
+Not: Bizz'in hizi onceki testlerden sonra artirildi (NavMeshAgent hizi 4.5) ve takip esikleri daraltildi; bu nedenle ortalama sure onceki senaryolardan kisadir.
