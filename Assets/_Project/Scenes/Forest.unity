@@ -204,7 +204,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &38512241
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12570,18 +12570,19 @@ MonoBehaviour:
   bumbuBubble: {fileID: 1450898312}
   shieldSpot: {fileID: 450536967}
   exitPoint: {fileID: 754756745}
-  returnExitPoint: {fileID: 1816747183}
   frontEdgeZ: 19
-  backEdgeZ: 25
   blockOffset: 2.5
+  fanSpinner: {fileID: 1275634564}
+  fanStopSeconds: 3
   windSpeedFactor: 0.15
   spotRadius: 2
   crossDistance: 1.5
   rejoinDistance: 3.5
-  rearmMargin: 3
+  hintRange: 12
   gap: 0.4
   lineDuration: 2.2
-  showDebug: 1
+  graceSeconds: 1
+  showDebug: 0
 --- !u!4 &2058176415
 Transform:
   m_ObjectHideFlags: 0
