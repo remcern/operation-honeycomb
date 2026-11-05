@@ -1,49 +1,130 @@
 ﻿
-
 using System.Collections;
 using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
+using OperationHoneycomb.Characters;
 
 public class OwlDialogueUI : MonoBehaviour
 {
+    [Header("Bilmece Arayuzu")]
     [SerializeField] private TMP_InputField answerInput;
     [SerializeField] private Button submitButton;
-    [SerializeField] private OllamaService ollamaService;
     [SerializeField] private TMP_Text owlResponseText;
     [SerializeField] private TMP_Text riddleQuestionText;
-    private RiddleData currentRiddle;
+
+    [Header("LLM ve Bilmece")]
+    [SerializeField] private OllamaService ollamaService;
     [SerializeField] private RiddleManager riddleManager;
-    private bool isProcessingAnswer = false;
-    private bool hasCompletedRiddles = false;
+
+    [Header("Baykus Konusma Balonu")]
+    [SerializeField] private SpeechBubble owlSpeechBubble;
+
     [Header("Baykus Etkilesimi")]
     [SerializeField] private Transform playerTransform;
     [SerializeField] private Transform owlSpot;
     [SerializeField] private CanvasGroup dialogueCanvasGroup;
     [SerializeField] private float interactionDistance = 5f;
+
+    [Header("Konusma Ayarlari")]
+    [SerializeField] private float nextRiddleDelay = 3f;
+
+    private RiddleData currentRiddle;
+    private bool isProcessingAnswer;
+    private bool hasCompletedRiddles;
+    private bool wasNearOwl;
+
     private void Awake()
     {
         SetDialogueVisible(false);
     }
 
+    private void Start()
+    {
+        if (answerInput == null ||
+            submitButton == null ||
+            ollamaService == null ||
+            owlResponseText == null ||
+            riddleQuestionText == null ||
+            riddleManager == null ||
+            owlSpeechBubble == null ||
+            playerTransform == null ||
+            owlSpot == null ||
+            dialogueCanvasGroup == null)
+        {
+            Debug.LogError(
+                "OwlDialogueUI: Inspector baglantilari eksik!"
+            );
+
+            enabled = false;
+            return;
+        }
+
+        currentRiddle = riddleManager.GetRandomRiddle();
+
+        if (currentRiddle == null)
+        {
+            Debug.LogError("OwlDialogueUI: Bilmece bulunamadi.");
+            enabled = false;
+            return;
+        }
+
+        answerInput.lineType = TMP_InputField.LineType.SingleLine;
+
+        submitButton.onClick.AddListener(SubmitAnswer);
+
+        riddleQuestionText.text = currentRiddle.Question;
+        owlResponseText.text = "";
+
+        Debug.Log("Bekci Baykus bilmece sistemi hazir.");
+    }
+
     private void Update()
     {
-        if (playerTransform == null || owlSpot == null ||
+        if (playerTransform == null ||
+            owlSpot == null ||
             dialogueCanvasGroup == null)
+        {
             return;
+        }
 
         Vector3 playerPosition = playerTransform.position;
         Vector3 owlPosition = owlSpot.position;
 
-        // Yalnizca yatay uzakligi kontrol et.
         playerPosition.y = 0f;
         owlPosition.y = 0f;
 
-        float distance = Vector3.Distance(playerPosition, owlPosition);
+        float distance = Vector3.Distance(
+            playerPosition,
+            owlPosition
+        );
 
-        SetDialogueVisible(distance <= interactionDistance);
+        bool isNearOwl = distance <= interactionDistance;
+
+        SetDialogueVisible(isNearOwl);
+
+        if (isNearOwl && !wasNearOwl)
+        {
+            if (hasCompletedRiddles)
+            {
+                ShowOwlSpeech(
+                    "Tebrikler! Bilmecelerimi cozdunuz. " +
+                    "Artik kapidan gecebilirsiniz!"
+                );
+            }
+            else if (!isProcessingAnswer && currentRiddle != null)
+            {
+                ShowOwlSpeech(currentRiddle.Question);
+            }
+        }
+
+        if (!isNearOwl && wasNearOwl)
+        {
+            HideOwlSpeech();
+        }
+
+        wasNearOwl = isNearOwl;
     }
 
     private void SetDialogueVisible(bool visible)
@@ -55,35 +136,44 @@ public class OwlDialogueUI : MonoBehaviour
         dialogueCanvasGroup.interactable = visible;
         dialogueCanvasGroup.blocksRaycasts = visible;
     }
-    private void Start()
 
+    private void ShowOwlSpeech(string message)
     {
-        currentRiddle = riddleManager != null
-    ? riddleManager.GetRandomRiddle()
-    : null;
-        if (answerInput == null ||
-            submitButton == null ||
-            ollamaService == null ||
-            owlResponseText == null ||
-            riddleQuestionText == null ||
-            currentRiddle == null
-            || riddleManager == null)
+        if (owlSpeechBubble == null ||
+            string.IsNullOrWhiteSpace(message))
         {
-            Debug.LogError(
-                "OwlDialogueUI: Inspector bağlantıları eksik!"
-            );
-
-            enabled = false;
             return;
         }
 
-        submitButton.onClick.AddListener(SubmitAnswer);
+        if (!IsPlayerNearOwl())
+            return;
 
-        riddleQuestionText.text = currentRiddle.Question;
-        owlResponseText.text = "Bekçi Baykuş: Yeni bilmeceni bekliyorum!";
-
-        Debug.Log("Bekçi Baykuş arayüzü hazır.");
+        owlSpeechBubble.Say(message, 3600f);
     }
+
+    private void HideOwlSpeech()
+    {
+        if (owlSpeechBubble != null)
+        {
+            owlSpeechBubble.Say("", 0f);
+        }
+    }
+
+    private bool IsPlayerNearOwl()
+    {
+        if (playerTransform == null || owlSpot == null)
+            return false;
+
+        Vector3 player = playerTransform.position;
+        Vector3 owl = owlSpot.position;
+
+        player.y = 0f;
+        owl.y = 0f;
+
+        return Vector3.Distance(player, owl)
+               <= interactionDistance;
+    }
+
     private void OnEnable()
     {
         if (answerInput != null)
@@ -98,22 +188,26 @@ public class OwlDialogueUI : MonoBehaviour
         {
             answerInput.onSubmit.RemoveListener(OnAnswerSubmitted);
         }
+
+        if (owlSpeechBubble != null)
+        {
+            HideOwlSpeech();
+        }
     }
 
     private void OnAnswerSubmitted(string value)
     {
-        if (isProcessingAnswer || hasCompletedRiddles)
-            return;
-
         SubmitAnswer();
     }
+
     private void SubmitAnswer()
     {
-        if (isProcessingAnswer)
+        if (isProcessingAnswer ||
+            hasCompletedRiddles ||
+            !IsPlayerNearOwl() ||
+            currentRiddle == null ||
+            answerInput == null)
         {
-            Debug.LogWarning(
-                "Önceki cevap hâlâ değerlendiriliyor."
-            );
             return;
         }
 
@@ -121,7 +215,7 @@ public class OwlDialogueUI : MonoBehaviour
 
         if (string.IsNullOrWhiteSpace(playerAnswer))
         {
-            Debug.LogWarning("Lütfen bir cevap yaz.");
+            ShowOwlSpeech("Once bir cevap yazmalisin!");
             return;
         }
 
@@ -131,81 +225,125 @@ public class OwlDialogueUI : MonoBehaviour
     private IEnumerator ProcessAnswer(string playerAnswer)
     {
         isProcessingAnswer = true;
+
+        answerInput.interactable = false;
         submitButton.interactable = false;
 
-        Debug.Log("Oyuncunun cevabı: " + playerAnswer);
+        Debug.Log("Oyuncunun cevabi: " + playerAnswer);
 
-        owlResponseText.text = "Bekçi Baykuş düşünüyor...";
+        ShowOwlSpeech("Hmm... Bir dusuneyim.");
+
+        RiddleData nextRiddle = null;
+        bool answerWasCorrect = false;
+        bool evaluationSucceeded = false;
 
         yield return StartCoroutine(
             ollamaService.EvaluateRiddle(
-            currentRiddle.RiddleId,
-            currentRiddle.Question,
-            currentRiddle.ExpectedAnswer,
+                currentRiddle.RiddleId,
+                currentRiddle.Question,
+                currentRiddle.ExpectedAnswer,
                 playerAnswer,
                 (result, error) =>
                 {
-
                     if (result != null)
                     {
+                        evaluationSucceeded = true;
+                        answerWasCorrect = result.is_correct;
+
                         string cleanResponse =
                             RemoveEmojis(result.owl_response);
 
                         owlResponseText.text =
-                            "Bekçi Baykuş: " + cleanResponse;
-                        if (result.is_correct && !riddleManager.AllRiddlesSolved)
+                            "Bekci Baykus: " + cleanResponse;
+
+                        ShowOwlSpeech(cleanResponse);
+
+                        if (answerWasCorrect &&
+                            !riddleManager.AllRiddlesSolved)
                         {
-                            RiddleData nextRiddle = riddleManager.GetRandomRiddle();
-
-                            if (nextRiddle != null)
-                            {
-                                currentRiddle = nextRiddle;
-                                answerInput.text = "";
-
-                                riddleQuestionText.text = currentRiddle.Question;
-
-                                owlResponseText.text =
-                                    "Bekçi Baykuş: Yeni bilmeceni bekliyorum!";
-
-                                Debug.Log("Yeni bilmece seçildi: " + currentRiddle.RiddleId);
-                            }
-                            else
-                            {
-                                Debug.LogWarning("Yeni bilmece seçilemedi!");
-                            }
+                            nextRiddle =
+                                riddleManager.GetRandomRiddle();
                         }
                     }
-
                     else
                     {
                         Debug.LogWarning(
-                            "Baykuş yanıt hatası: " + error
+                            "Baykus yanit hatasi: " + error
                         );
 
+                        string errorMessage =
+                            string.IsNullOrWhiteSpace(error)
+                                ? "Su anda cevap veremiyorum. Tekrar dene."
+                                : error;
+
                         owlResponseText.text =
-                            "Bekçi Baykuş: " +
-                            (string.IsNullOrWhiteSpace(error)
-                                ? "Şu anda cevap veremiyorum. Lütfen tekrar dene."
-                                : error);
+                            "Bekci Baykus: " + errorMessage;
+
+                        ShowOwlSpeech(errorMessage);
                     }
                 }
             )
         );
-        if (riddleManager.AllRiddlesSolved)
+
+        if (evaluationSucceeded && answerWasCorrect)
         {
-            hasCompletedRiddles = true;
-
-            riddleQuestionText.text = "Tüm bilmeceleri çözdün!";
-            owlResponseText.text =
-                "Bekçi Baykuş: Tebrikler! Bütün bilmeceleri başarıyla tamamladın.";
-
             answerInput.text = "";
-            answerInput.interactable = false;
 
-            Debug.Log("Tüm bilmeceler tamamlandı. Cevap gönderme kapatıldı.");
+            // Oyuncu once Ollama'nin tebrik mesajini gorur.
+            yield return new WaitForSecondsRealtime(
+                nextRiddleDelay
+            );
+
+            if (riddleManager.AllRiddlesSolved)
+            {
+                hasCompletedRiddles = true;
+
+                riddleQuestionText.text =
+                    "Tum bilmeceleri cozdun!";
+
+                string finalMessage =
+                    "Tebrikler! Iki bilmecemi de cozdunuz. " +
+                    "Kapi artik acik!";
+
+                owlResponseText.text =
+                    "Bekci Baykus: " + finalMessage;
+
+                ShowOwlSpeech(finalMessage);
+
+                answerInput.text = "";
+                answerInput.interactable = false;
+                submitButton.interactable = false;
+
+                Debug.Log(
+                    "Tum bilmeceler tamamlandi. Kapi acilmali."
+                );
+            }
+            else if (nextRiddle != null)
+            {
+                currentRiddle = nextRiddle;
+
+                riddleQuestionText.text =
+                    currentRiddle.Question;
+
+                owlResponseText.text = "";
+
+                ShowOwlSpeech(currentRiddle.Question);
+
+                Debug.Log(
+                    "Yeni bilmece secildi: " +
+                    currentRiddle.RiddleId
+                );
+            }
+            else
+            {
+                Debug.LogWarning(
+                    "Sonraki bilmece secilemedi."
+                );
+            }
         }
 
         isProcessingAnswer = false;
+
         answerInput.interactable = !hasCompletedRiddles;
         submitButton.interactable = !hasCompletedRiddles;
     }
@@ -213,9 +351,7 @@ public class OwlDialogueUI : MonoBehaviour
     private string RemoveEmojis(string input)
     {
         if (string.IsNullOrEmpty(input))
-        {
             return string.Empty;
-        }
 
         StringBuilder result = new StringBuilder();
 
@@ -228,18 +364,20 @@ public class OwlDialogueUI : MonoBehaviour
                 if (i + 1 < input.Length &&
                     char.IsLowSurrogate(input[i + 1]))
                 {
-                    codePoint = char.ConvertToUtf32(input[i], input[i + 1]);
+                    codePoint = char.ConvertToUtf32(
+                        input[i],
+                        input[i + 1]
+                    );
+
                     i++;
                 }
                 else
                 {
-                    // Geçersiz Unicode karakterini atla.
                     continue;
                 }
             }
             else if (char.IsLowSurrogate(input[i]))
             {
-                // Eşleşmeyen düşük surrogate karakterini atla.
                 continue;
             }
             else
@@ -248,26 +386,31 @@ public class OwlDialogueUI : MonoBehaviour
             }
 
             bool isEmoji =
-                (codePoint >= 0x1F000 && codePoint <= 0x1FAFF) ||
-                (codePoint >= 0x2600 && codePoint <= 0x27BF) ||
+                (codePoint >= 0x1F000 &&
+                 codePoint <= 0x1FAFF) ||
+                (codePoint >= 0x2600 &&
+                 codePoint <= 0x27BF) ||
                 codePoint == 0xFE0F ||
                 codePoint == 0x200D;
 
             if (!isEmoji)
             {
-                result.Append(char.ConvertFromUtf32(codePoint));
+                result.Append(
+                    char.ConvertFromUtf32(codePoint)
+                );
             }
         }
 
         return result.ToString().Trim();
     }
 
-
     private void OnDestroy()
     {
         if (submitButton != null)
         {
-            submitButton.onClick.RemoveListener(SubmitAnswer);
+            submitButton.onClick.RemoveListener(
+                SubmitAnswer
+            );
         }
     }
 }
