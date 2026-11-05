@@ -6,7 +6,7 @@ namespace OperationHoneycomb.Characters
     /// <summary>NavMeshAgent'ı saran hareket sınıfı. Yol bulmayı Unity NavMesh yapar;
     /// bu sınıf yalnızca "şuraya git", "dur" ve "vardın mı?" sorularını yanıtlar.</summary>
     [RequireComponent(typeof(NavMeshAgent))]
-    public sealed class CompanionAgent : MonoBehaviour, IWindAffected
+    public sealed class CompanionAgent : MonoBehaviour, IWindAffected, ICompanionMover
     {
         [Header("Hareket")]
         [SerializeField] private float stoppingDistance = 0.4f;
