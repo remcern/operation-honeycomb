@@ -76,4 +76,23 @@ public class OllamaJsonValidationTests
 
         Assert.IsTrue(result);
     }
+    [Test]
+    public void IsCorrectAlaniEksikseReddedilir()
+    {
+        string json = "{\"owl_response\":\"Merhaba\"}";
+
+        bool result = TestJson(json);
+
+        Assert.IsFalse(result);
+    }
+
+    [Test]
+    public void OwlResponseAlaniEksikseReddedilir()
+    {
+        string json = "{\"is_correct\":false}";
+
+        bool result = TestJson(json);
+
+        Assert.IsFalse(result);
+    }
 }
