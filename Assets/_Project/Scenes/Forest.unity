@@ -10575,7 +10575,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1452522520
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11247,9 +11247,17 @@ MonoBehaviour:
   endScreenDelay: 2.5
   gameTitle: 'OPERATION: HONEYCOMB'
   startSubtitle: "Bumbu ve Bizz'in bal maceras\u0131"
+  controlsHint: "Bumbu: W A S D   |   Bizz'e emir: E   |   \u0130ptal: Q"
   endTitle: MACERA TAMAMLANDI
   endLine1: "Bal bulundu, dostluk kazand\u0131."
   endLine2: "Bumbu mutlu bir k\u0131\u015F uykusuna yatt\u0131..."
+  backgroundTop: {r: 0.12, g: 0.06, b: 0.02, a: 1}
+  backgroundBottom: {r: 0.42, g: 0.22, b: 0.04, a: 1}
+  honeyGold: {r: 0.98, g: 0.74, b: 0.12, a: 1}
+  honeyAmber: {r: 0.86, g: 0.5, b: 0.04, a: 1}
+  cream: {r: 1, g: 0.93, b: 0.68, a: 1}
+  deepBrown: {r: 0.2, g: 0.1, b: 0.02, a: 1}
+  honeycombStrength: 0.28
 --- !u!4 &1615181426
 Transform:
   m_ObjectHideFlags: 0
