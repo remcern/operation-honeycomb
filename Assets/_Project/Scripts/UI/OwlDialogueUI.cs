@@ -127,15 +127,31 @@ public class OwlDialogueUI : MonoBehaviour
         wasNearOwl = isNearOwl;
     }
 
+
     private void SetDialogueVisible(bool visible)
     {
         if (dialogueCanvasGroup == null)
             return;
 
+        if (!visible && dialogueCanvasGroup.interactable)
+        {
+            if (answerInput != null)
+            {
+                answerInput.DeactivateInputField();
+            }
+
+            if (UnityEngine.EventSystems.EventSystem.current != null)
+            {
+                UnityEngine.EventSystems.EventSystem.current
+                    .SetSelectedGameObject(null);
+            }
+        }
+
         dialogueCanvasGroup.alpha = visible ? 1f : 0f;
         dialogueCanvasGroup.interactable = visible;
         dialogueCanvasGroup.blocksRaycasts = visible;
     }
+
 
     private void ShowOwlSpeech(string message)
     {

@@ -229,6 +229,19 @@ public class OllamaService : MonoBehaviour, IRiddleEvaluator
             result.is_correct = result.is_correct && exactMatch;
 
             if (!result.is_correct &&
+                result.owl_response.IndexOf(
+                    "tebrik",
+                    StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                Debug.LogWarning(
+                    "LLM yanlis cevabi tebrik etti. Yanit duzeltiliyor."
+                );
+
+                result.owl_response =
+                    "Bu cevap dogru degil. Bir kez daha deneyebilirsin.";
+            }
+
+            if (!result.is_correct &&
                 !string.IsNullOrWhiteSpace(expectedAnswer) &&
                 result.owl_response.IndexOf(
                     expectedAnswer,
