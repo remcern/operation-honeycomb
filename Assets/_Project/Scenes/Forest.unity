@@ -602,7 +602,19 @@ MonoBehaviour:
       m_Calls: []
   onFinaleEnded:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1615181425}
+        m_TargetAssemblyTypeName: OperationHoneycomb.Characters.GameFlowMenu, Assembly-CSharp
+        m_MethodName: ShowEndScreen
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!4 &162131550
 Transform:
   m_ObjectHideFlags: 0
@@ -10563,7 +10575,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1452522520
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10581,7 +10593,7 @@ MonoBehaviour:
   doorObject: {fileID: 1324489882}
   useObstacle: 0
   obstacle: {fileID: 1450898307}
-  scenarioName: takipli
+  scenarioName: final
   trialCount: 30
   seed: 12345
   trialTimeout: 40
@@ -11202,6 +11214,65 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1610406381}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1615181424
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1615181426}
+  - component: {fileID: 1615181425}
+  m_Layer: 0
+  m_Name: GameFlowMenu
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1615181425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1615181424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9002fa5a0b4d22e46a150adbee8157eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OperationHoneycomb.Characters.GameFlowMenu
+  showStartMenu: 1
+  endScreenDelay: 2.5
+  gameTitle: 'OPERATION: HONEYCOMB'
+  startSubtitle: "Bumbu ve Bizz'in bal maceras\u0131"
+  controlsHint: "Bumbu: W A S D   |   Bizz'e emir: E   |   \u0130ptal: Q"
+  endTitle: MACERA TAMAMLANDI
+  endLine1: "Bal bulundu, dostluk kazand\u0131."
+  endLine2: "Bumbu mutlu bir k\u0131\u015F uykusuna yatt\u0131..."
+  backgroundTop: {r: 0.12, g: 0.06, b: 0.02, a: 1}
+  backgroundBottom: {r: 0.42, g: 0.22, b: 0.04, a: 1}
+  honeyGold: {r: 0.98, g: 0.74, b: 0.12, a: 1}
+  honeyAmber: {r: 0.86, g: 0.5, b: 0.04, a: 1}
+  cream: {r: 1, g: 0.93, b: 0.68, a: 1}
+  deepBrown: {r: 0.2, g: 0.1, b: 0.02, a: 1}
+  honeycombStrength: 0.28
+--- !u!4 &1615181426
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1615181424}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -19.2, y: 11.342, z: 53.3625}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1646047249
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13049,3 +13120,4 @@ SceneRoots:
   - {fileID: 1938558041}
   - {fileID: 162131550}
   - {fileID: 1762004002}
+  - {fileID: 1615181426}

@@ -75,17 +75,18 @@ namespace OperationHoneycomb.Characters
         private void Notice(string text)
         {
             _notice = text;
-         _noticeUntil = Time.unscaledTime + 6f;
+            _noticeUntil = Time.unscaledTime + 6f;
         }
 
         private void OnGUI()
         {
             if (companion == null) return;
-            GUI.Label(new Rect(10, 10, 500, 25), "E: Bizz mandala git   Q: iptal");
-            GUI.Label(new Rect(10, 32, 500, 25), "Bizz durumu: " + companion.CurrentStateName);
+
+            // Sol üstte yalnızca tek ipucu kalır (Q yine çalışır, ekranda yazmaz)
+            GUI.Label(new Rect(10, 10, 500, 25), "E: Bizz'i mandala gönder");
 
             if (!string.IsNullOrEmpty(_notice) && Time.unscaledTime < _noticeUntil)
-                          {
+            {
                 var style = new GUIStyle(GUI.skin.label);
                 style.fontSize = 22;
                 style.fontStyle = FontStyle.Bold;
